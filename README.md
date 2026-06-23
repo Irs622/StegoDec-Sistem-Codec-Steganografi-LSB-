@@ -60,3 +60,11 @@ Setelah server aktif, buka peramban dan akses:
   - `css/style.css`: Kustomisasi visual dan animasi.
   - `js/app.js`: Script frontend interaktif untuk upload file, preview, dan query API Flask.
 - `uploads/`: Direktori penyimpanan sementara untuk file cover dan stego hasil pemrosesan (dibuat otomatis).
+- `defense_arguments.md`: Berkas panduan argumen pertahanan sidang UAS mengenai batasan kompresi lossy.
+
+---
+
+## ❓ FAQ Sidang Capstone
+
+**Q: Mengapa pesan stego rusak saat dikirim biasa lewat WhatsApp/Social Media?**  
+A: Aplikasi media sosial secara otomatis melakukan kompresi *lossy* (JPEG) yang merubah nilai piksel halus guna menghemat bandwidth. StegoDec dirancang menggunakan format **PNG (lossless)** untuk kebutuhan penyimpanan lokal (*cold storage*) atau pengiriman dokumen tanpa kompresi (*send as document*). Penjelasan lengkap & skrip argumen untuk menjawab penguji dapat dibaca di berkas [defense_arguments.md](file:///Users/mac/Downloads/hushmedia/defense_arguments.md).

@@ -83,11 +83,11 @@ DELIMITER = b'====STEGODEC_END===='
 
 
 def get_scrambled_indices(total_pixels, password=None):
-    """Menghasilkan array indeks piksel yang diacak secara konsisten menggunakan seed dari password."""
+    """Menghasilkan array indeks piksel yang diacak secara konsisten menggunakan seed konstan."""
     indices = np.arange(total_pixels, dtype=np.int32)
     
-    # Gunakan password (atau default seed jika tidak ada) untuk mengacak indeks
-    seed_str = password if password else "STEGODEC_DEFAULT_SEED"
+    # Gunakan default seed yang konstan agar delimiter selalu dapat dibaca dari piksel-piksel yang sama
+    seed_str = "STEGODEC_DEFAULT_SEED"
     
     # Hasilkan seed 32-bit integer yang stabil menggunakan hashlib SHA-256
     seed_hash = int(hashlib.sha256(seed_str.encode('utf-8')).hexdigest(), 16) % (2**32)
@@ -190,7 +190,7 @@ def decode_image_stego(image_path, password=None):
 
     flat_img = img.flatten()
 
-    # Dapatkan indeks piksel yang diacak berdasarkan password
+    # Dapatkan indeks piksel yang diacak berdasarkan seed konstan
     scrambled_indices = get_scrambled_indices(len(flat_img), password)
 
     # Ambil LSB dari piksel berdasarkan urutan acak secara vectorized
@@ -201,31 +201,48 @@ def decode_image_stego(image_path, password=None):
 
     # Cari penanda delimiter di dalam bytes secara efisien
     delim_idx = extracted_bytes.find(DELIMITER)
-    if delim_idx != -1:
-        # Ambil data terkompresi (tanpa delimiter)
-        compressed_data = extracted_bytes[:delim_idx]
+    if delim_idx == -1:
+        return {'success': False, 'error': 'Bukan berkas stego (delimiter tidak ditemukan)'}
+
+    # Ambil data terkompresi (tanpa delimiter)
+    compressed_data = extracted_bytes[:delim_idx]
+    try:
+        # Step 2: CODEC — Dekompresi zlib
+        decompressed = zlib.decompress(compressed_data)
+        raw_message = decompressed.decode('utf-8')
+    except Exception:
+        # Jika dekompresi gagal, data terkompresi rusak / bukan berkas stego yang valid
+        return {'success': False, 'error': 'Bukan berkas stego (delimiter tidak ditemukan)'}
+
+    # Step 3: Dekripsi password jika ada
+    if raw_message.startswith("SECURE_"):
+        if not password:
+            return {'success': False, 'error': 'Pesan ini terkunci! Harap masukkan Kata Sandi untuk membuka.'}
         try:
-            # Step 2: CODEC — Dekompresi zlib
-            decompressed = zlib.decompress(compressed_data)
-            raw_message = decompressed.decode('utf-8')
-
-            # Step 3: Dekripsi password jika ada
             final_message = decrypt_text(raw_message, password)
-
             return {
                 'success': True,
                 'message': final_message,
                 'compressed_size': len(compressed_data),
                 'decompressed_size': len(decompressed),
-                'is_encrypted': raw_message.startswith("SECURE_")
+                'is_encrypted': True
             }
         except ValueError as ve:
-            # Password salah atau data terenkripsi tanpa password
-            return {'success': False, 'error': str(ve)}
+            error_str = str(ve)
+            if "Kata sandi salah" in error_str or "kunci sandi salah" in error_str:
+                return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+            return {'success': False, 'error': error_str}
         except Exception:
-            return {'success': False, 'error': 'Dekompresi gagal. File mungkin rusak atau kunci sandi salah.'}
-
-    return {'success': False, 'error': 'Pesan rahasia tidak ditemukan dalam gambar ini. Pastikan kunci sandi benar.'}
+            return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+    else:
+        # File tidak terenkripsi
+        return {
+            'success': True,
+            'message': raw_message,
+            'compressed_size': len(compressed_data),
+            'decompressed_size': len(decompressed),
+            'is_encrypted': False
+        }
 
 
 # ==========================================
@@ -442,7 +459,7 @@ def demo_stego_decode():
                 'extracted_message': raw_bytes.decode('utf-8', errors='replace')
             })
             
-        return jsonify({'success': False, 'error': 'Delimiter steganografi tidak ditemukan. Pastikan file benar dan password seed cocok.'})
+        return jsonify({'success': False, 'error': 'Bukan berkas stego (delimiter tidak ditemukan)'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:

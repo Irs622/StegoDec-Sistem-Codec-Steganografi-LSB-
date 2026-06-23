@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     let encoderFile = null;
     let decoderFile = null;
+    let encoderImageCapacity = 0;
 
     // ==========================================
     // DOM REFERENCES
@@ -74,10 +75,48 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 1000);
 
     // ==========================================
-    // CHARACTER COUNTER
+    // DYNAMIC CAPACITY INDICATOR HELPERS
+    // ==========================================
+    function updateCapacityIndicator() {
+        const indicator = document.getElementById('capacity-indicator');
+        if (!encoderFile || encoderImageCapacity === 0) {
+            indicator.classList.add('hidden');
+            return;
+        }
+
+        const message = secretMessage.value;
+        const pwd = encodePassword.value;
+
+        // Estimasi byte payload: XOR-Vigenere + zlib + Delimiter
+        // zlib kompresi teks umumnya menghemat 50%, tapi untuk teks pendek ada overhead.
+        // Sebagai estimasi aman batas atas, kita gunakan panjang terenkripsi + delimiter.
+        const payloadLength = pwd ? (12 + Math.ceil(message.length / 3) * 4) : message.length;
+        const delimiterLength = 20; // ====STEGODEC_END====
+        const estimatedBits = (payloadLength + delimiterLength) * 8;
+
+        indicator.classList.remove('hidden');
+
+        const capacityRibu = (encoderImageCapacity / 1000).toFixed(1);
+
+        if (estimatedBits > encoderImageCapacity) {
+            indicator.className = "text-[10px] font-mono text-[#e22718] uppercase mt-2 font-bold animate-pulse";
+            indicator.textContent = `Kapasitas gambar ini: ${capacityRibu} ribu bit. Pesan Anda saat ini: ${estimatedBits} bit (Terlalu Besar)`;
+        } else {
+            indicator.className = "text-[10px] font-mono text-green-400 uppercase mt-2";
+            indicator.textContent = `Kapasitas gambar ini: ${capacityRibu} ribu bit. Pesan Anda saat ini: ${estimatedBits} bit (Aman)`;
+        }
+    }
+
+    // ==========================================
+    // CHARACTER COUNTER & INPUT LISTENERS
     // ==========================================
     secretMessage.addEventListener('input', function () {
         charCount.textContent = secretMessage.value.length + ' CHR';
+        updateCapacityIndicator();
+    });
+
+    encodePassword.addEventListener('input', function () {
+        updateCapacityIndicator();
     });
 
     // ==========================================
@@ -98,15 +137,26 @@ document.addEventListener('DOMContentLoaded', function () {
         encoderFileDetails.textContent =
             'IMAGE \u2022 ' + (file.size / 1024).toFixed(1) + ' KB \u2022 ' + (file.type || 'binary');
 
-        // Show image preview
+        // Show image preview and calculate capacity
         encoderPreviewImg.classList.add('hidden');
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function () {
                 encoderPreviewImg.src = reader.result;
                 encoderPreviewImg.classList.remove('hidden');
+
+                // Dapatkan resolusi gambar
+                const img = new Image();
+                img.src = reader.result;
+                img.onload = function () {
+                    encoderImageCapacity = img.naturalWidth * img.naturalHeight * 3; // RGB channels
+                    updateCapacityIndicator();
+                };
             };
             reader.readAsDataURL(file);
+        } else {
+            encoderImageCapacity = 0;
+            updateCapacityIndicator();
         }
 
         // Reset previous results

@@ -37,6 +37,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let encodeFile = null;
     let decodeFile = null;
+    let encoderImageCapacity = 0;
+
+    // ==========================================
+    // DYNAMIC CAPACITY INDICATOR HELPERS
+    // ==========================================
+    function updateCapacityIndicator() {
+        const indicator = document.getElementById('stego-capacity-indicator');
+        if (!encodeFile || encoderImageCapacity === 0) {
+            indicator.classList.add('hidden');
+            return;
+        }
+
+        const message = stegoMessage.value;
+        const delimiterLength = 20; // ====STEGODEC_END====
+        const estimatedBits = (message.length + delimiterLength) * 8;
+
+        indicator.classList.remove('hidden');
+
+        const capacityRibu = (encoderImageCapacity / 1000).toFixed(1);
+
+        if (estimatedBits > encoderImageCapacity) {
+            indicator.className = "text-[10px] font-mono text-[#e22718] uppercase mt-2 font-bold animate-pulse";
+            indicator.textContent = `Kapasitas gambar ini: ${capacityRibu} ribu bit. Pesan Anda saat ini: ${estimatedBits} bit (Terlalu Besar)`;
+        } else {
+            indicator.className = "text-[10px] font-mono text-green-400 uppercase mt-2";
+            indicator.textContent = `Kapasitas gambar ini: ${capacityRibu} ribu bit. Pesan Anda saat ini: ${estimatedBits} bit (Aman)`;
+        }
+    }
+
+    stegoMessage.addEventListener('input', function () {
+        updateCapacityIndicator();
+    });
 
     // ==========================================
     // ENCODE FILE UPLOAD PREVIEW
@@ -56,8 +88,18 @@ document.addEventListener('DOMContentLoaded', function () {
             reader.onload = function () {
                 encodePreview.src = reader.result;
                 encodePreview.classList.remove('hidden');
+
+                const img = new Image();
+                img.src = reader.result;
+                img.onload = function () {
+                    encoderImageCapacity = img.naturalWidth * img.naturalHeight * 3;
+                    updateCapacityIndicator();
+                };
             };
             reader.readAsDataURL(file);
+        } else {
+            encoderImageCapacity = 0;
+            updateCapacityIndicator();
         }
 
         // Reset previous results
