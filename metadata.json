@@ -1,0 +1,6 @@
+{
+  "name": "HushMedia",
+  "description": "Secure & Lightweight Media Courier - Steganography and media compression tool for sending secret, password-encrypted messages disguised within images, audio, and video.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

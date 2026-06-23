@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegoDec — Sistem Codec & Steganografi LSB</title>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="min-h-screen bg-[#000000] text-[#ffffff] font-sans flex flex-col selection:bg-[#e22718] selection:text-white overflow-x-hidden antialiased">
+
+    <!-- M Tricolor Divider pinned at the top -->
+    <div class="fixed top-0 left-0 w-full z-50">
+        <div class="flex h-1 w-full overflow-hidden select-none">
+            <div class="bg-[#0066b1] h-full flex-1"></div>
+            <div class="bg-[#1c69d4] h-full flex-1"></div>
+            <div class="bg-[#e22718] h-full flex-1"></div>
+        </div>
+    </div>
+
+    <!-- TOP NAVIGATION CHROME -->
+    <nav class="h-16 border-b border-[#262626] bg-[#000000] flex items-center justify-between px-6 lg:px-12 mt-1 z-40">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5 font-bold tracking-tighter text-xl">
+                <span class="text-white font-black italic tracking-widest text-[#ffffff]">STEGO</span>
+                <span class="text-white italic tracking-widest font-light mr-1">DEC</span>
+                <div class="flex flex-col gap-[2px] w-6 h-5 justify-center">
+                    <div class="h-[3px] w-full bg-[#0066b1]"></div>
+                    <div class="h-[3px] w-[85%] bg-[#1c69d4]"></div>
+                    <div class="h-[3px] w-[70%] bg-[#e22718]"></div>
+                </div>
+            </div>
+            <span class="hidden sm:inline-block text-[11px] font-mono text-[#bbbbbb] border-l border-[#3c3c3c] pl-4 uppercase font-light">
+                CODEC & LSB STEGANOGRAPHY SYSTEM
+            </span>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="hidden md:flex items-center gap-5 text-[12px] font-bold tracking-[1.5px] uppercase">
+                <a href="#payload-terminal" class="text-[#ffffff] border-b border-white pb-1">ENCODER</a>
+                <a href="#payload-terminal" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity cursor-pointer">DECODER</a>
+                <a href="#system-metrics" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity cursor-pointer">METRICS</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-mono text-[#e22718] bg-[#e22718]/10 px-2.5 py-0.5 rounded-sm border border-[#e22718]/30 tracking-widest uppercase font-bold animate-pulse">
+                    LINE SECURED
+                </span>
+                <span class="text-[10px] font-mono text-[#bbbbbb]">V2.04</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BRAND BANNER -->
+    <section class="relative bg-[#0d0d0d] border-b border-[#262626] py-16 px-6 lg:px-12 overflow-hidden flex flex-col justify-end min-h-[340px]">
+        <div class="absolute inset-0 opacity-[0.06] pointer-events-none select-none bg-[radial-gradient(#3c3c3c_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-[#e20015]/10 via-transparent to-transparent pointer-events-none opacity-45"></div>
+
+        <div class="max-w-7xl mx-auto w-full relative z-10">
+            <span class="text-[14px] font-bold tracking-[2px] text-[#e22718] uppercase block mb-3 font-mono">
+                // STEGANOGRAPHY INTEGRATION SYSTEM
+            </span>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter uppercase mb-4 text-[#ffffff] font-sans max-w-4xl leading-none">
+                ENGINEERED TO CONCEAL.<br>
+                COMPRESSED LOSSLESSLY.
+            </h1>
+            <p class="text-[16px] font-light text-[#bbbbbb] max-w-2xl leading-relaxed mb-6">
+                StegoDec adalah instrumen enkripsi dan steganografi UAS Capstone. Amankan instruksi, password, atau teks rahasia ke dalam berkas gambar (lossless format PNG) secara ringkas, ringan, dan tidak terdeteksi oleh analisis visual biasa dengan kompresi zlib.
+            </p>
+            
+            <div class="flex gap-4">
+                <a href="#payload-terminal" class="bg-[#ffffff] text-[#000] hover:bg-[#bbbbbb] h-12 px-8 flex items-center justify-center text-xs font-bold tracking-[2px] transition-all uppercase rounded-none">
+                    INTEGRASI PANELS
+                </a>
+                <div class="border border-[#3c3c3c] hover:border-white text-white h-12 px-6 flex items-center justify-center text-xs font-bold tracking-[1.5px] transition-all uppercase rounded-none gap-2 font-mono">
+                    <i data-lucide="clock" class="w-4 h-4 text-[#0066b1]"></i>
+                    UPTIME: <span id="uptime-display">10:14:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full h-[3px]">
+            <div class="flex h-1 w-full overflow-hidden select-none">
+                <div class="bg-[#0066b1] h-full flex-1"></div>
+                <div class="bg-[#1c69d4] h-full flex-1"></div>
+                <div class="bg-[#e22718] h-full flex-1"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE WORKING PANELS: TWO COLUMN GRID -->
+    <main id="payload-terminal" class="max-w-7xl mx-auto w-full px-6 lg:px-12 py-16 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12">
+        
+        <!-- INPUT ENCODER PANEL -->
+        <section class="bg-[#0d0d0d] border border-[#262626] rounded-none p-6 md:p-8 relative flex flex-col justify-between">
+            <div class="absolute top-0 right-0 w-16 h-[2px] bg-[#e22718]"></div>
+            
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[11px] font-mono text-[#bbbbbb] tracking-widest uppercase">
+                        [ SERVICE_MODULE_01 ]
+                    </span>
+                    <span class="text-[10px] font-mono text-[#e22718] font-bold">ENCODER ACTIVE</span>
+                </div>
+
+                <h2 class="text-2xl font-bold tracking-tighter uppercase text-white mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 bg-[#e22718] inline-block rounded-none"></span>
+                    SEMBUNYIKAN PESAN (ENCODE)
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Cover File Upload -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                            01. UNGGAH COVER CONTAINER (FILE MEDIA)
+                        </label>
+                        <div class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[140px] rounded-none group cursor-pointer">
+                            <input 
+                                type="file" 
+                                id="encoder-file-input"
+                                name="file"
+                                accept="image/*" 
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            
+                            <!-- Empty State -->
+                            <div id="encoder-empty" class="pointer-events-none flex flex-col items-center">
+                                <i data-lucide="upload" class="w-8 h-8 text-[#bbbbbb] group-hover:text-white transition-colors mb-2 font-light"></i>
+                                <span class="text-[12px] text-[#ffffff] font-bold tracking-[1px] block mb-1">
+                                    DRAG & DROP COVER FILE (MAX 16MB)
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono block uppercase">
+                                    SUPPORTED: PNG, JPG, JPEG
+                                </span>
+                            </div>
+
+                            <!-- Selected State -->
+                            <div id="encoder-info" class="relative z-20 pointer-events-none flex flex-col items-center hidden">
+                                <img 
+                                    id="encoder-preview-img"
+                                    src="" 
+                                    alt="Encoder preview" 
+                                    class="max-h-24 w-auto object-contain border border-[#3c3c3c] mb-3 preview-img hidden"
+                                />
+                                <span id="encoder-file-name" class="text-xs text-white font-bold tracking-tight max-w-[280px] truncate block mb-1">
+                                    -
+                                </span>
+                                <span id="encoder-file-details" class="text-[10px] text-[#bbbbbb] font-mono lowercase">
+                                    -
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secret Message Input -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                02. PESAN RAHASIA YANG AKAN DISISIPKAN
+                            </label>
+                            <span id="char-count" class="text-[9px] font-mono text-[#bbbbbb] bg-[#262626] px-1.5 py-0.5">0 CHR</span>
+                        </div>
+                        <textarea
+                            id="secret-message"
+                            name="message"
+                            placeholder="Ketik rahasia terdalam Anda di sini..."
+                            class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white p-3 text-xs font-mono h-28 rounded-none leading-relaxed"
+                        ></textarea>
+                    </div>
+
+                    <!-- Password Lock -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                            PASSWORD LOCK (OPTIONAL)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password"
+                                id="encode-password"
+                                name="password"
+                                placeholder="SANDI DEKRIPSI"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white px-3 py-2 text-xs font-mono rounded-none"
+                            />
+                            <i data-lucide="lock" class="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#3c3c3c]"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 border-t border-[#262626] pt-6 flex flex-col sm:flex-row gap-4">
+                <button
+                    type="button"
+                    id="encode-btn"
+                    class="flex-1 bg-white text-black font-extrabold hover:bg-[#bbbbbb] py-3 text-xs tracking-[2px] uppercase rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                    <i id="encode-btn-icon" data-lucide="shield" class="w-4 h-4 fill-black text-black"></i>
+                    <span id="encode-btn-text">PROCESS & HUSH MEDIA</span>
+                </button>
+
+                <div id="encode-result" class="hidden flex">
+                    <a
+                        id="download-link"
+                        href="#"
+                        class="bg-[#1c69d4] hover:bg-blue-600 text-white font-extrabold px-6 py-3 text-xs tracking-[1.5px] uppercase rounded-none flex items-center justify-center gap-2 border border-blue-400/50 cursor-pointer"
+                    >
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        UNDUH FILE STEGO
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- OUTPUT DECODER PANEL -->
+        <section class="bg-[#0d0d0d] border border-[#262626] rounded-none p-6 md:p-8 relative flex flex-col justify-between">
+            <div class="absolute top-0 right-0 w-16 h-[2px] bg-[#1c69d4]"></div>
+
+            <div>
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[11px] font-mono text-[#bbbbbb] tracking-widest uppercase">
+                        [ SERVICE_MODULE_02 ]
+                    </span>
+                    <span class="text-[10px] font-mono text-[#60a5fa] font-bold">DECODER STANDBY</span>
+                </div>
+
+                <h2 class="text-2xl font-bold tracking-tighter uppercase text-white mb-6 flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 bg-[#1c69d4] inline-block rounded-none"></span>
+                    BONGKAR PESAN RAHASIA (DECODE)
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Stego File Input Selector -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                            01. UNGGAH FILE STEGO YG INGIN DI-EXTRACT
+                        </label>
+                        <div class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[140px] rounded-none group cursor-pointer">
+                            <input 
+                                type="file" 
+                                id="decoder-file-input"
+                                name="file"
+                                accept="image/*"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+
+                            <!-- Empty State -->
+                            <div id="decoder-empty" class="pointer-events-none flex flex-col items-center">
+                                <i data-lucide="upload" class="w-8 h-8 text-[#bbbbbb] group-hover:text-white transition-colors mb-2 font-light"></i>
+                                <span class="text-[12px] text-[#60a5fa] font-bold tracking-[1px] block mb-1">
+                                    UPLOAD MEDIA STEGO HERE
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono block uppercase">
+                                    MASUKKAN FILE GAMBAR HASIL SISIPAN
+                                </span>
+                            </div>
+
+                            <!-- Selected State -->
+                            <div id="decoder-info" class="relative z-20 pointer-events-none flex flex-col items-center hidden">
+                                <img 
+                                    id="decoder-preview-img"
+                                    src="" 
+                                    alt="Decoder preview" 
+                                    class="max-h-24 w-auto object-contain border border-[#3c3c3c] mb-3 preview-img hidden"
+                                />
+                                <span id="decoder-file-name" class="text-xs text-white font-bold tracking-tight max-w-[280px] truncate block mb-1">
+                                    -
+                                </span>
+                                <span id="decoder-file-details" class="text-[10px] text-[#bbbbbb] font-mono lowercase">
+                                    -
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decode Password Input -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                            MASUKKAN KATA SANDI (JIKA DIKUNCI PAS ENCODE)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password"
+                                id="decode-password"
+                                name="password"
+                                placeholder="KUNCI PENGAMAN"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white px-3 py-2 text-xs font-mono rounded-none"
+                            />
+                            <i data-lucide="unlock" class="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#3c3c3c]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button
+                        type="button"
+                        id="decode-btn"
+                        class="w-full border border-white text-white hover:bg-white hover:text-black font-extrabold py-3 text-xs tracking-[2px] transition-all uppercase rounded-none cursor-pointer"
+                    >
+                        <span id="decode-btn-text">PROSES EKSTRAKSI (START DECODE)</span>
+                    </button>
+
+                    <!-- Decrypted Payload Result block -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                            EXTRACTED DECRYPTION PAYLOAD
+                        </label>
+                        <div class="bg-[#000000] border border-[#3c3c3c] min-h-[142px] p-4 font-mono text-xs relative overflow-y-auto max-h-[220px]">
+                            
+                            <!-- Empty State -->
+                            <div id="decode-result-empty" class="absolute inset-0 flex flex-col items-center justify-center bg-black/85 p-3 text-center">
+                                <i data-lucide="lock" class="w-5 h-5 text-slate-400 mb-2 animate-pulse"></i>
+                                <span class="text-[10px] text-slate-400 tracking-[1px] uppercase block mb-1">
+                                    SILAKAN UNGGAH DAN DECODE MEDIA STEGO
+                                </span>
+                                <span class="text-[8px] text-slate-600 uppercase">
+                                    Keluaran teks rahasia akan dicetak di sini setelah proses dekripsi
+                                </span>
+                            </div>
+
+                            <!-- Error State -->
+                            <div id="decode-result-error" class="absolute inset-0 flex flex-col items-center justify-center bg-[#1c0205] text-center p-4 border border-red-500/30 hidden">
+                                <i data-lucide="alert-triangle" class="w-6 h-6 text-[#e22718] mb-2 animate-bounce"></i>
+                                <span class="text-[10px] text-red-500 font-extrabold uppercase">DECODE_FAILS</span>
+                                <p id="decode-error-text" class="text-[11px] text-[#bbbbbb] mt-2 font-mono whitespace-pre-wrap leading-relaxed max-w-sm border border-red-500/20 bg-black/60 p-2">
+                                    -
+                                </p>
+                            </div>
+
+                            <!-- Success State -->
+                            <div id="decode-result-success" class="relative hidden">
+                                <div class="flex justify-between items-center border-b border-[#262626] pb-2 mb-3">
+                                    <span class="text-[10px] text-green-400 uppercase font-bold tracking-widest flex items-center gap-1.5">
+                                        <i data-lucide="check" class="w-3.5 h-3.5"></i> EXTRACT_FOUND_SUCCESS:
+                                    </span>
+                                    <button
+                                        type="button"
+                                        id="copy-result-btn"
+                                        onclick="copyExtractedMessage()"
+                                        class="p-1 rounded-none bg-[#111111] hover:bg-[#333333] border border-[#3c3c3c] text-white"
+                                        title="Salin hasil pesan"
+                                    >
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <p id="extracted-message" class="text-white bg-[#0a0a0a] p-3 border border-emerald-500/20 rounded-none text-xs leading-relaxed whitespace-pre font-mono break-all selection:bg-emerald-600 select-text">
+                                    -
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="text-[9px] text-slate-500 font-mono tracking-widest mt-8 uppercase border-t border-[#262626] pt-4 text-right">
+                COURIER DECODER UNIT INTEL
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SYSTEM HARDWARE AUDIT: STEG-ANALYSIS REPORT PORTLET -->
+    <section id="system-metrics" class="bg-[#000000] border-t border-b border-[#262626] py-16 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto w-full">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-[#262626] pb-6 mb-8 gap-4">
+                <div>
+                    <span class="text-[13px] font-bold tracking-[2px] text-[#e22718] block uppercase font-mono mb-2">
+                        // SYSTEM SECURITY INTEGRITY REPORT
+                    </span>
+                    <h3 class="text-3xl font-black uppercase tracking-tight text-white m-0">
+                        CYBER STEG-AUDIT METRICS
+                    </h3>
+                </div>
+                <div class="text-xs text-[#bbbbbb] font-mono flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 bg-green-500 animate-pulse"></span>
+                    <span>ENGINE STATS: ACTIVE (12 THREADS MULTIPROCESSOR)</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Thread Uptime Panel -->
+                <div class="bg-[#0d0d0d] border border-[#262626] p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] text-[#bbbbbb] block uppercase font-mono tracking-widest mb-4">// DEVICE STATUS</span>
+                        
+                        <div class="space-y-4 font-mono text-xs">
+                            <div class="flex justify-between border-b border-[#262626] pb-2">
+                                <span class="text-[#bbbbbb]">CPU_CORE_STATUS</span>
+                                <span class="text-white font-bold uppercase">SECURED</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-2">
+                                <span class="text-[#bbbbbb]">ACTIVE_COURIER_THREADS</span>
+                                <span class="text-white font-bold">12 INSTANCES</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-2">
+                                <span class="text-[#bbbbbb]">DECRYPT_LATENCY</span>
+                                <span class="text-white font-bold">1.2ms / AVERAGE</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#bbbbbb]">AUDIT_PROTOCOL</span>
+                                <span class="text-[#e22718] font-black uppercase">AES_VIGENERE_INTEGRAL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-[#262626]">
+                        <div class="flex justify-between text-[10px] text-slate-500 uppercase tracking-widest mb-1.5 font-mono">
+                            <span>Hush Stealth Compression ratio</span>
+                            <span>64.2%</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-[#1a1a1a] rounded-none flex overflow-hidden">
+                            <div class="bg-[#0066b1] h-full" style="width: 33.3%"></div>
+                            <div class="bg-[#1c69d4] h-full" style="width: 33.3%"></div>
+                            <div class="bg-[#e22718] h-full" style="width: 33.3%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encoder Stats Panel -->
+                <div class="bg-[#0d0d0d] border border-[#262626] p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] text-[#bbbbbb] block uppercase font-mono tracking-widest mb-4">// ENCODER METRICS</span>
+                        
+                        <!-- Stats Empty State -->
+                        <div id="stats-empty" class="h-40 border border-dashed border-[#262626] flex flex-col items-center justify-center text-center p-4">
+                            <i data-lucide="eye" class="w-8 h-8 text-[#3c3c3c] mb-2"></i>
+                            <span class="text-[10px] font-mono text-[#bbbbbb] uppercase tracking-widest block mb-1">
+                                STANDBY ENCODER STATS
+                            </span>
+                            <span class="text-[8px] text-slate-500 font-mono uppercase">
+                                Jalankan ENCODE untuk memuat statistika berkas stego
+                            </span>
+                        </div>
+
+                        <!-- Stats Content State -->
+                        <div id="stats-content" class="hidden space-y-3 font-mono text-xs">
+                            <div class="flex justify-between border-b border-[#262626] pb-1.5">
+                                <span class="text-[#bbbbbb]">ORIGINAL_SIZE</span>
+                                <span id="stat-original" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-1.5">
+                                <span class="text-[#bbbbbb]">COMPRESSED_SIZE</span>
+                                <span id="stat-compressed" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-1.5">
+                                <span class="text-[#bbbbbb]">COMPRESSION_RATIO</span>
+                                <span id="stat-ratio" class="text-green-400 font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-1.5">
+                                <span class="text-[#bbbbbb]">BITS_EMBEDDED</span>
+                                <span id="stat-bits" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-1.5">
+                                <span class="text-[#bbbbbb]">CONTAINER_CAPACITY</span>
+                                <span id="stat-capacity" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between pb-1.5">
+                                <span class="text-[#bbbbbb]">CAPACITY_USAGE</span>
+                                <span id="stat-usage" class="text-[#e22718] font-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capacity Progress Bar -->
+                    <div class="mt-4 pt-4 border-t border-[#262626]">
+                        <div class="flex justify-between text-[10px] text-slate-500 uppercase tracking-widest mb-1.5 font-mono">
+                            <span>LSB Payload Capacity Usage</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-[#1a1a1a] rounded-none overflow-hidden">
+                            <div id="capacity-progress" class="bg-[#e22718] h-full progress-bar animate-pulse" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decoder Stats Panel -->
+                <div class="bg-[#0d0d0d] border border-[#262626] p-6 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] text-[#bbbbbb] block uppercase font-mono tracking-widest mb-4">// DECODER METRICS</span>
+                        
+                        <div id="decode-stats-content" class="space-y-4 font-mono text-xs">
+                            <div class="flex justify-between border-b border-[#262626] pb-2">
+                                <span class="text-[#bbbbbb]">DECODED_COMPRESSED</span>
+                                <span id="decode-compressed" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between border-b border-[#262626] pb-2">
+                                <span class="text-[#bbbbbb]">DECOMPRESSED_SIZE</span>
+                                <span id="decode-decompressed" class="text-white font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#bbbbbb]">ENCRYPTED_PAYLOAD</span>
+                                <span id="decode-encrypted" class="text-white font-bold uppercase">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-[#262626] text-[10px] text-slate-500 font-mono leading-relaxed">
+                        <span class="uppercase tracking-wider block mb-1">// STATUS LAPORAN DEKODE</span>
+                        Modul dekode memeriksa keberadaan penanda khusus <code class="text-slate-400">====STEGODEC_END====</code> sebelum melakukan dekompresi bit LSB secara lossless.
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MANUAL OPERASIONAL SECTION -->
+    <section class="bg-[#050505] py-16 px-6 lg:px-12 text-[#ffffff]">
+        <div class="max-w-7xl mx-auto w-full">
+            
+            <div class="border-b border-[#262626] pb-6 mb-8">
+                <span class="text-[13px] font-bold tracking-[2px] text-[#0066b1] uppercase font-mono block mb-2">
+                    // STEGODEC PROTOCOL LABS
+                </span>
+                <h3 class="text-3xl font-black uppercase tracking-tight text-white">
+                    MANUAL OPERASIONAL (AGENT HANDBOOK)
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs font-mono text-[#bbbbbb] leading-relaxed">
+                <div class="border-l-2 border-[#0066b1] pl-4 space-y-2">
+                    <span class="text-white font-extrabold uppercase block tracking-wider text-[11px]">
+                        01_ALUR PENYANDIAN (ENCODER)
+                    </span>
+                    <p class="font-light">
+                        Unggah file utama Anda sebagai penyamar (cover) pesan rahasia di dalam form pembungkus. Ketikkan pesan inti yang ingin diisikan. Agar terlindung dari analisis visual yang tajam, kami sarankan Anda memasang Kata Sandi pembuka. Tekan tombol 'PROCESS & HUSH' untuk memicu enkripsi, kompresi lossless zlib, dan penyisipan bit LSB.
+                    </p>
+                </div>
+
+                <div class="border-l-2 border-[#1c69d4] pl-4 space-y-2">
+                    <span class="text-white font-extrabold uppercase block tracking-wider text-[11px]">
+                        02_PENGIRIMAN CARRIER (MEDIA STEGO)
+                    </span>
+                    <p class="font-light">
+                        Setelah dokumen stego berhasil diunduh, Anda dapat membagikannya kepada penerima melalui saluran komunikasi yang aman (seperti email atau pesan instan). Format PNG menjaga integritas bit piksel steganografi dari degradasi kompresi lossy.
+                    </p>
+                </div>
+
+                <div class="border-l-2 border-[#e22718] pl-4 space-y-2">
+                    <span class="text-white font-extrabold uppercase block tracking-wider text-[11px]">
+                        03_EKSTRAKSI DAN BONGKAR (DECODER)
+                    </span>
+                    <p class="font-light">
+                        Penerima mengunduh lampiran Anda, membuka modul pembongkar di panel sisi kanan StegoDec, melaraskan file tersebut, menyematkan Kunci Kata Sandi yang tepat, dan mengetuk 'START EXTRACTION'. Sistem StegoDec-core akan mendeteksi penanda khusus steganografi dan memulihkan payload pesan asli.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- BRUTALIST INDUSTRIAL FOOTER -->
+    <footer class="bg-[#000000] border-t border-[#262626] py-12 px-6 lg:px-12 mt-auto">
+        <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-[11px] font-mono text-[#bbbbbb] font-light">
+            
+            <div class="space-y-1.5 text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="text-white font-black italic tracking-wider text-xs">STEGODEC</span>
+                    <span class="text-[#3c3c3c]">|</span>
+                    <span class="text-white uppercase font-bold text-[10px]">COURIER TEAM INDUSTRIAL</span>
+                </div>
+                <p class="text-[10px] uppercase tracking-wide">
+                    Secure Communications Platform // Manufactured in strict accordance with cryptographic compliance.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-x-8 gap-y-2 text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                <div>
+                    ACCURACY_LIMITS: <span class="text-green-400">100% BIT PERFECT</span>
+                </div>
+                <div>
+                    CODEC_COMPRESSION: <span class="text-white">LOSSLESS ZLIB</span>
+                </div>
+                <div>
+                    CRYPTO_INTEGRITY: <span class="text-[#0066b1]">VIGENERE-XOR Cipher</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto w-full text-center mt-12 text-[9px] text-[#3c3c3c] tracking-[0.4em] uppercase select-none">
+            STEGODEC MOTORSPORT COURIER CO — PROPRIETARY LABS INTERFACE v2.04
+        </div>
+    </footer>
+
+    <!-- Lucide Icon Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Application Logic -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

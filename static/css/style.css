@@ -1,0 +1,110 @@
+/* ==========================================
+   StegoDec — Custom Styles
+   Supplement Tailwind CDN with custom properties
+   ========================================== */
+
+/* Selection color override */
+::selection {
+    background: #e22718;
+    color: white;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Body base */
+body {
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #000000;
+}
+::-webkit-scrollbar-thumb {
+    background: #3c3c3c;
+    border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* File input reset */
+input[type="file"] {
+    cursor: pointer;
+}
+
+/* Textarea resize */
+textarea {
+    resize: vertical;
+}
+
+/* Button disabled state */
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed !important;
+}
+
+/* Pulse animation for status indicators */
+@keyframes status-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.status-pulse {
+    animation: status-pulse 2s ease-in-out infinite;
+}
+
+/* Scan line animation for loading states */
+@keyframes scan-line {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.scan-animate {
+    animation: scan-line 1.5s ease-in-out infinite;
+}
+
+/* Bounce animation delays */
+.bounce-delay-1 {
+    animation-delay: 75ms;
+}
+.bounce-delay-2 {
+    animation-delay: 150ms;
+}
+.bounce-delay-3 {
+    animation-delay: 300ms;
+}
+
+/* Progress bar transition */
+.progress-bar {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fade-in 0.4s ease-out;
+}
+
+/* Image preview transition */
+.preview-img {
+    transition: all 0.3s ease;
+}
+
+.preview-img:hover {
+    transform: scale(1.02);
+}
