@@ -351,6 +351,6 @@ cleanup_thread.start()
 if __name__ == '__main__':
     print("=" * 50)
     print("  StegoDec — Sistem Codec & Steganografi")
-    print("  Server berjalan di http://localhost:5000")
+    print("  Server berjalan di http://localhost:5001")
     print("=" * 50)
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
