@@ -8,6 +8,7 @@ import base64
 import random
 import uuid
 import hashlib
+import wave
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -246,13 +247,675 @@ def decode_image_stego(image_path, password=None):
 
 
 # ==========================================
-# ROUTING FLASK (MENGHUBUNGKAN KE FRONTEND)
+# AUDIO & VIDEO STEGANOGRAPHY + CODEC ALGORITHMS
+# ==========================================
+
+def encode_audio_stego(audio_path, secret_message, output_path, password=None):
+    """Menyisipkan pesan terenkripsi dan terkompresi ke LSB piksel audio WAV PCM."""
+    processed_message = encrypt_text(secret_message, password)
+    raw_bytes = processed_message.encode('utf-8')
+    compressed = zlib.compress(raw_bytes, 9)
+    payload = compressed + DELIMITER
+
+    payload_np = np.frombuffer(payload, dtype=np.uint8)
+    bits = np.unpackbits(payload_np)
+    n_bits = len(bits)
+
+    with wave.open(audio_path, 'rb') as wav_in:
+        params = wav_in.getparams()
+        n_channels = params.nchannels
+        sampwidth = params.sampwidth
+        n_frames = params.nframes
+        frames = wav_in.readframes(n_frames)
+
+    if sampwidth == 1:
+        audio_data = np.frombuffer(frames, dtype=np.uint8).copy()
+    elif sampwidth == 2:
+        audio_data = np.frombuffer(frames, dtype=np.int16).copy()
+    else:
+        raise ValueError("Hanya mendukung file WAV 8-bit atau 16-bit PCM.")
+
+    if n_bits > len(audio_data):
+        raise ValueError(
+            f"File audio terlalu pendek! Kapasitas LSB: {len(audio_data)} bit, "
+            f"Dibutuhkan: {n_bits} bit. Gunakan file WAV yang lebih panjang."
+        )
+
+    scrambled_indices = get_scrambled_indices(len(audio_data), password)
+    target_indices = scrambled_indices[:n_bits]
+
+    if sampwidth == 1:
+        audio_data[target_indices] = (audio_data[target_indices] & 0xFE) | bits
+    else:
+        audio_data[target_indices] = (audio_data[target_indices] & ~1) | bits
+
+    with wave.open(output_path, 'wb') as wav_out:
+        wav_out.setparams(params)
+        wav_out.writeframes(audio_data.tobytes())
+
+    original_size = len(raw_bytes)
+    compressed_size = len(compressed)
+    compression_ratio = (1 - compressed_size / max(original_size, 1)) * 100
+
+    return {
+        'original_size': original_size,
+        'compressed_size': compressed_size,
+        'compression_ratio': round(compression_ratio, 1),
+        'bits_embedded': n_bits,
+        'audio_capacity': len(audio_data),
+        'capacity_used': round(n_bits / len(audio_data) * 100, 2)
+    }
+
+
+def decode_audio_stego(audio_path, password=None):
+    """Mengekstrak pesan dari LSB audio WAV PCM."""
+    with wave.open(audio_path, 'rb') as wav_in:
+        params = wav_in.getparams()
+        sampwidth = params.sampwidth
+        n_frames = params.nframes
+        frames = wav_in.readframes(n_frames)
+
+    if sampwidth == 1:
+        audio_data = np.frombuffer(frames, dtype=np.uint8)
+    elif sampwidth == 2:
+        audio_data = np.frombuffer(frames, dtype=np.int16)
+    else:
+        raise ValueError("Hanya mendukung file WAV 8-bit atau 16-bit PCM.")
+
+    scrambled_indices = get_scrambled_indices(len(audio_data), password)
+    lsb_bits = audio_data[scrambled_indices] & 1
+    extracted_bytes = np.packbits(lsb_bits).tobytes()
+
+    delim_idx = extracted_bytes.find(DELIMITER)
+    if delim_idx == -1:
+        return {'success': False, 'error': 'Bukan berkas stego audio (delimiter tidak ditemukan)'}
+
+    compressed_data = extracted_bytes[:delim_idx]
+    try:
+        decompressed = zlib.decompress(compressed_data)
+        raw_message = decompressed.decode('utf-8')
+    except Exception:
+        return {'success': False, 'error': 'Bukan berkas stego audio (data terkompresi rusak)'}
+
+    if raw_message.startswith("SECURE_"):
+        if not password:
+            return {'success': False, 'error': 'Pesan ini terkunci! Harap masukkan Kata Sandi untuk membuka.'}
+        try:
+            final_message = decrypt_text(raw_message, password)
+            return {
+                'success': True,
+                'message': final_message,
+                'compressed_size': len(compressed_data),
+                'decompressed_size': len(decompressed),
+                'is_encrypted': True
+            }
+        except ValueError as ve:
+            error_str = str(ve)
+            if "Kata sandi salah" in error_str or "kunci sandi salah" in error_str:
+                return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+            return {'success': False, 'error': error_str}
+        except Exception:
+            return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+    else:
+        return {
+            'success': True,
+            'message': raw_message,
+            'compressed_size': len(compressed_data),
+            'decompressed_size': len(decompressed),
+            'is_encrypted': False
+        }
+
+
+def encode_video_stego(video_path, secret_message, output_path, password=None):
+    """Menyisipkan pesan ke LSB frame video AVI lossless."""
+    processed_message = encrypt_text(secret_message, password)
+    raw_bytes = processed_message.encode('utf-8')
+    compressed = zlib.compress(raw_bytes, 9)
+    payload = compressed + DELIMITER
+
+    payload_np = np.frombuffer(payload, dtype=np.uint8)
+    bits = np.unpackbits(payload_np)
+    n_bits = len(bits)
+
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError("Gagal membuka file video.")
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if fps <= 0 or np.isnan(fps):
+        fps = 24.0
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Coba menggunakan codec FFV1 lossless
+    fourcc = cv2.VideoWriter_fourcc(*'FFV1')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+    if not out.isOpened():
+        # Fallback ke raw/uncompressed
+        out = cv2.VideoWriter(output_path, 0, fps, (width, height))
+        if not out.isOpened():
+            fourcc = cv2.VideoWriter_fourcc(*'I420')
+            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+            if not out.isOpened():
+                cap.release()
+                raise ValueError("Tidak dapat menginisialisasi VideoWriter.")
+
+    bits_embedded = 0
+    frames_processed = 0
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        if bits_embedded < n_bits:
+            flat_frame = frame.flatten()
+            remaining_bits = n_bits - bits_embedded
+            chunk_size = min(len(flat_frame), remaining_bits)
+
+            scrambled = get_scrambled_indices(len(flat_frame), password)
+            target_indices = scrambled[:chunk_size]
+
+            frame_bits = bits[bits_embedded : bits_embedded + chunk_size]
+            flat_frame[target_indices] = (flat_frame[target_indices] & 0xFE) | frame_bits
+
+            frame = flat_frame.reshape(frame.shape)
+            bits_embedded += chunk_size
+
+        out.write(frame)
+        frames_processed += 1
+
+    cap.release()
+    out.release()
+
+    if bits_embedded < n_bits:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        raise ValueError(
+            f"Video terlalu pendek! Kapasitas LSB: {frames_processed * width * height * 3} bit, "
+            f"Dibutuhkan: {n_bits} bit. Gunakan file video yang lebih panjang."
+        )
+
+    original_size = len(raw_bytes)
+    compressed_size = len(compressed)
+    compression_ratio = (1 - compressed_size / max(original_size, 1)) * 100
+    video_capacity = frames_processed * width * height * 3
+
+    return {
+        'original_size': original_size,
+        'compressed_size': compressed_size,
+        'compression_ratio': round(compression_ratio, 1),
+        'bits_embedded': n_bits,
+        'video_capacity': video_capacity,
+        'capacity_used': round(n_bits / max(video_capacity, 1) * 100, 4)
+    }
+
+
+def decode_video_stego(video_path, password=None):
+    """Mengekstrak pesan dari LSB frame video AVI."""
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError("Gagal membuka file video.")
+
+    all_extracted_bytes = bytearray()
+    found_delim = False
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        flat_frame = frame.flatten()
+        scrambled = get_scrambled_indices(len(flat_frame), password)
+
+        frame_bits = flat_frame[scrambled] & 1
+        frame_bytes = np.packbits(frame_bits).tobytes()
+        all_extracted_bytes.extend(frame_bytes)
+
+        delim_idx = all_extracted_bytes.find(DELIMITER)
+        if delim_idx != -1:
+            found_delim = True
+            break
+
+    cap.release()
+
+    if not found_delim:
+        return {'success': False, 'error': 'Bukan berkas stego video (delimiter tidak ditemukan)'}
+
+    delim_idx = all_extracted_bytes.find(DELIMITER)
+    compressed_data = bytes(all_extracted_bytes[:delim_idx])
+    try:
+        decompressed = zlib.decompress(compressed_data)
+        raw_message = decompressed.decode('utf-8')
+    except Exception:
+        return {'success': False, 'error': 'Bukan berkas stego video (data terkompresi rusak)'}
+
+    if raw_message.startswith("SECURE_"):
+        if not password:
+            return {'success': False, 'error': 'Pesan ini terkunci! Harap masukkan Kata Sandi untuk membuka.'}
+        try:
+            final_message = decrypt_text(raw_message, password)
+            return {
+                'success': True,
+                'message': final_message,
+                'compressed_size': len(compressed_data),
+                'decompressed_size': len(decompressed),
+                'is_encrypted': True
+            }
+        except ValueError as ve:
+            error_str = str(ve)
+            if "Kata sandi salah" in error_str or "kunci sandi salah" in error_str:
+                return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+            return {'success': False, 'error': error_str}
+        except Exception:
+            return {'success': False, 'error': 'Password salah (data gagal didekripsi)'}
+    else:
+        return {
+            'success': True,
+            'message': raw_message,
+            'compressed_size': len(compressed_data),
+            'decompressed_size': len(decompressed),
+            'is_encrypted': False
+        }
+
+
+# ==========================================
+# MEDIA COMPRESSION CODECS ALGORITHMS
+# ==========================================
+
+def compress_image_file(input_path, output_path, format_type, quality):
+    """Kompresi berkas gambar (JPEG/WebP/PNG)."""
+    img = cv2.imread(input_path)
+    if img is None:
+        raise ValueError("Gagal membaca berkas gambar.")
+
+    quality = int(quality)
+    if format_type.upper() == 'JPEG':
+        cv2.imwrite(output_path, img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
+    elif format_type.upper() == 'WEBP':
+        cv2.imwrite(output_path, img, [int(cv2.IMWRITE_WEBP_QUALITY), quality])
+    elif format_type.upper() == 'PNG':
+        comp_level = int((100 - quality) / 10)
+        comp_level = max(0, min(9, comp_level))
+        cv2.imwrite(output_path, img, [int(cv2.IMWRITE_PNG_COMPRESSION), comp_level])
+    else:
+        raise ValueError("Format gambar tidak didukung.")
+
+    original_size = os.path.getsize(input_path)
+    compressed_size = os.path.getsize(output_path)
+    ratio = (1 - compressed_size / max(original_size, 1)) * 100
+
+    return {
+        'original_size': original_size,
+        'compressed_size': compressed_size,
+        'compression_ratio': round(ratio, 1),
+        'format_type': format_type.upper(),
+        'quality_setting': quality
+    }
+
+
+def compress_audio_file(input_path, output_path, sample_rate_factor, bit_depth_factor):
+    """Kompresi WAV audio (downsampling & bit-depth reduction)."""
+    with wave.open(input_path, 'rb') as wav_in:
+        params = wav_in.getparams()
+        n_channels = params.nchannels
+        sampwidth = params.sampwidth
+        framerate = params.framerate
+        n_frames = params.nframes
+        frames = wav_in.readframes(n_frames)
+
+    if sampwidth == 1:
+        audio_data = np.frombuffer(frames, dtype=np.uint8).copy()
+    elif sampwidth == 2:
+        audio_data = np.frombuffer(frames, dtype=np.int16).copy()
+    else:
+        raise ValueError("Hanya mendukung file WAV 8-bit atau 16-bit PCM.")
+
+    audio_data = audio_data.reshape(-1, n_channels)
+    step = int(sample_rate_factor)
+    if step < 1:
+        step = 1
+
+    compressed_data = audio_data[::step]
+    new_framerate = int(framerate / step)
+
+    new_sampwidth = sampwidth
+    if bit_depth_factor == '8' and sampwidth == 2:
+        # 16-bit to 8-bit
+        compressed_data = ((compressed_data.astype(np.int32) + 32768) // 256).astype(np.uint8)
+        new_sampwidth = 1
+    elif bit_depth_factor == '16' and sampwidth == 1:
+        # 8-bit to 16-bit
+        compressed_data = (compressed_data.astype(np.int32) * 256 - 32768).astype(np.int16)
+        new_sampwidth = 2
+
+    with wave.open(output_path, 'wb') as wav_out:
+        wav_out.setnchannels(n_channels)
+        wav_out.setsampwidth(new_sampwidth)
+        wav_out.setframerate(new_framerate)
+        wav_out.writeframes(compressed_data.tobytes())
+
+    original_size = os.path.getsize(input_path)
+    compressed_size = os.path.getsize(output_path)
+    ratio = (1 - compressed_size / max(original_size, 1)) * 100
+
+    return {
+        'original_size': original_size,
+        'compressed_size': compressed_size,
+        'compression_ratio': round(ratio, 1),
+        'original_samplerate': framerate,
+        'new_samplerate': new_framerate,
+        'original_bitdepth': sampwidth * 8,
+        'new_bitdepth': new_sampwidth * 8
+    }
+
+
+def compress_video_file(input_path, output_path, scale_factor, target_fps):
+    """Kompresi video (resolution scaling & frame-rate reduction)."""
+    cap = cv2.VideoCapture(input_path)
+    if not cap.isOpened():
+        raise ValueError("Gagal membuka file video.")
+
+    orig_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    orig_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    orig_fps = cap.get(cv2.CAP_PROP_FPS)
+    if orig_fps <= 0 or np.isnan(orig_fps):
+        orig_fps = 24.0
+
+    new_width = int(orig_width * scale_factor)
+    new_height = int(orig_height * scale_factor)
+
+    new_width = max(16, (new_width // 2) * 2)
+    new_height = max(16, (new_height // 2) * 2)
+
+    out_fps = float(target_fps)
+    if out_fps > orig_fps:
+        out_fps = orig_fps
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_path, fourcc, out_fps, (new_width, new_height))
+    if not out.isOpened():
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter(output_path, fourcc, out_fps, (new_width, new_height))
+        if not out.isOpened():
+            cap.release()
+            raise ValueError("Tidak dapat menginisialisasi VideoWriter untuk kompresi.")
+
+    frame_interval = max(1, int(orig_fps / out_fps))
+    count = 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        if count % frame_interval == 0:
+            resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
+            out.write(resized_frame)
+        count += 1
+
+    cap.release()
+    out.release()
+
+    original_size = os.path.getsize(input_path)
+    compressed_size = os.path.getsize(output_path)
+    ratio = (1 - compressed_size / max(original_size, 1)) * 100
+
+    return {
+        'original_size': original_size,
+        'compressed_size': compressed_size,
+        'compression_ratio': round(ratio, 1),
+        'original_resolution': f"{orig_width}x{orig_height}",
+        'new_resolution': f"{new_width}x{new_height}",
+        'original_fps': round(orig_fps, 1),
+        'new_fps': round(out_fps, 1)
+    }
+
+
+# ==========================================
+# FLASK ROUTING (MENGHUBUNGKAN KE FRONTEND)
 # ==========================================
 
 @app.route('/')
 def index():
     """Halaman utama — memuat UI dari templates/index.html"""
     return render_template('index.html')
+
+
+# ==========================================
+# ROUTING API BARU (AUDIO / VIDEO / CODEC)
+# ==========================================
+
+@app.route('/encode/audio', methods=['POST'])
+def encode_audio():
+    if 'file' not in request.files or 'message' not in request.form:
+        return jsonify({"success": False, "error": "Data tidak lengkap. Unggah file WAV dan isi pesan."}), 400
+
+    file = request.files['file']
+    message = request.form['message'].strip()
+    password = request.form.get('password', '').strip() or None
+
+    if not file.filename or not message:
+        return jsonify({"success": False, "error": "File WAV dan pesan rahasia wajib diisi."}), 400
+
+    safe_name = secure_filename(file.filename)
+    if not safe_name.lower().endswith('.wav'):
+        return jsonify({"success": False, "error": "Hanya mendukung file audio berformat .WAV."}), 400
+
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'audio_in_{safe_name}')
+    result_name = f'stego_audio_{uuid.uuid4().hex[:8]}.wav'
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
+
+    file.save(input_path)
+
+    try:
+        stats = encode_audio_stego(input_path, message, output_path, password)
+        return jsonify({
+            'success': True,
+            'download_url': f'/download/{result_name}',
+            'filename': result_name,
+            **stats
+        })
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Terjadi kesalahan server: {str(e)}"}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/decode/audio', methods=['POST'])
+def decode_audio():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "Tidak ada file audio yang diunggah."}), 400
+
+    file = request.files['file']
+    password = request.form.get('password', '').strip() or None
+
+    if not file.filename:
+        return jsonify({"success": False, "error": "Tidak ada file audio yang dipilih."}), 400
+
+    safe_name = secure_filename(file.filename)
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'audio_dec_{safe_name}')
+    file.save(input_path)
+
+    try:
+        result = decode_audio_stego(input_path, password)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Terjadi kesalahan: {str(e)}"}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/encode/video', methods=['POST'])
+def encode_video():
+    if 'file' not in request.files or 'message' not in request.form:
+        return jsonify({"success": False, "error": "Data tidak lengkap. Unggah file video dan isi pesan."}), 400
+
+    file = request.files['file']
+    message = request.form['message'].strip()
+    password = request.form.get('password', '').strip() or None
+
+    if not file.filename or not message:
+        return jsonify({"success": False, "error": "File video dan pesan rahasia wajib diisi."}), 400
+
+    safe_name = secure_filename(file.filename)
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'video_in_{safe_name}')
+    result_name = f'stego_video_{uuid.uuid4().hex[:8]}.avi'
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
+
+    file.save(input_path)
+
+    try:
+        stats = encode_video_stego(input_path, message, output_path, password)
+        return jsonify({
+            'success': True,
+            'download_url': f'/download/{result_name}',
+            'filename': result_name,
+            **stats
+        })
+    except ValueError as ve:
+        return jsonify({"success": False, "error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Terjadi kesalahan server: {str(e)}"}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/decode/video', methods=['POST'])
+def decode_video():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "Tidak ada file video yang diunggah."}), 400
+
+    file = request.files['file']
+    password = request.form.get('password', '').strip() or None
+
+    if not file.filename:
+        return jsonify({"success": False, "error": "Tidak ada file video yang dipilih."}), 400
+
+    safe_name = secure_filename(file.filename)
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'video_dec_{safe_name}')
+    file.save(input_path)
+
+    try:
+        result = decode_video_stego(input_path, password)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": f"Terjadi kesalahan: {str(e)}"}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/codec/compress/image', methods=['POST'])
+def codec_compress_image():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "Unggah gambar terlebih dahulu."}), 400
+
+    file = request.files['file']
+    format_type = request.form.get('format', 'JPEG').strip()
+    quality = request.form.get('quality', '70').strip()
+
+    if not file.filename:
+        return jsonify({"success": False, "error": "File gambar wajib dipilih."}), 400
+
+    safe_name = secure_filename(file.filename)
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'img_comp_in_{safe_name}')
+    ext = format_type.lower()
+    result_name = f'compressed_img_{uuid.uuid4().hex[:8]}.{ext}'
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
+
+    file.save(input_path)
+
+    try:
+        stats = compress_image_file(input_path, output_path, format_type, quality)
+        return jsonify({
+            'success': True,
+            'download_url': f'/download/{result_name}',
+            'filename': result_name,
+            **stats
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/codec/compress/audio', methods=['POST'])
+def codec_compress_audio():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "Unggah file WAV terlebih dahulu."}), 400
+
+    file = request.files['file']
+    rate_factor = request.form.get('rate_factor', '2').strip()
+    bit_depth = request.form.get('bit_depth', '8').strip()
+
+    if not file.filename:
+        return jsonify({"success": False, "error": "File audio wajib dipilih."}), 400
+
+    safe_name = secure_filename(file.filename)
+    if not safe_name.lower().endswith('.wav'):
+        return jsonify({"success": False, "error": "Hanya mendukung file WAV untuk kompresi audio."}), 400
+
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'aud_comp_in_{safe_name}')
+    result_name = f'compressed_aud_{uuid.uuid4().hex[:8]}.wav'
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
+
+    file.save(input_path)
+
+    try:
+        stats = compress_audio_file(input_path, output_path, rate_factor, bit_depth)
+        return jsonify({
+            'success': True,
+            'download_url': f'/download/{result_name}',
+            'filename': result_name,
+            **stats
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+
+@app.route('/codec/compress/video', methods=['POST'])
+def codec_compress_video():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "Unggah video terlebih dahulu."}), 400
+
+    file = request.files['file']
+    scale = request.form.get('scale', '0.5').strip()
+    fps = request.form.get('fps', '15').strip()
+
+    if not file.filename:
+        return jsonify({"success": False, "error": "File video wajib dipilih."}), 400
+
+    safe_name = secure_filename(file.filename)
+    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'vid_comp_in_{safe_name}')
+    result_name = f'compressed_vid_{uuid.uuid4().hex[:8]}.mp4'
+    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
+
+    file.save(input_path)
+
+    try:
+        scale_val = float(scale)
+        fps_val = float(fps)
+        stats = compress_video_file(input_path, output_path, scale_val, fps_val)
+        return jsonify({
+            'success': True,
+            'download_url': f'/download/{result_name}',
+            'filename': result_name,
+            **stats
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
 
 
 # ==========================================

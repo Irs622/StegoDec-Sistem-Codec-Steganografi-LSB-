@@ -5,7 +5,7 @@
 
 /* Selection color override */
 ::selection {
-    background: #e22718;
+    background: #dd9691;
     color: white;
 }
 
@@ -27,13 +27,16 @@ body {
 ::-webkit-scrollbar {
     width: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: #000000;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #3c3c3c;
     border-radius: 0;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
@@ -56,8 +59,15 @@ button:disabled {
 
 /* Pulse animation for status indicators */
 @keyframes status-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
 }
 
 .status-pulse {
@@ -66,8 +76,13 @@ button:disabled {
 
 /* Scan line animation for loading states */
 @keyframes scan-line {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
 }
 
 .scan-animate {
@@ -78,9 +93,11 @@ button:disabled {
 .bounce-delay-1 {
     animation-delay: 75ms;
 }
+
 .bounce-delay-2 {
     animation-delay: 150ms;
 }
+
 .bounce-delay-3 {
     animation-delay: 300ms;
 }
@@ -92,8 +109,15 @@ button:disabled {
 
 /* Fade in animation */
 @keyframes fade-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {

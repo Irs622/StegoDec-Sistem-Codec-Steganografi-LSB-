@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,10 @@
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -23,11 +26,13 @@
             }
         }
     </script>
-    
+
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="min-h-screen bg-[#000000] text-[#ffffff] font-sans flex flex-col selection:bg-[#e22718] selection:text-white overflow-x-hidden antialiased">
+
+<body
+    class="min-h-screen bg-[#000000] text-[#ffffff] font-sans flex flex-col selection:bg-[#e22718] selection:text-white overflow-x-hidden antialiased">
 
     <!-- M Tricolor Divider pinned at the top -->
     <div class="fixed top-0 left-0 w-full z-50">
@@ -50,7 +55,8 @@
                     <div class="h-[3px] w-[70%] bg-[#e22718]"></div>
                 </div>
             </a>
-            <span class="hidden sm:inline-block text-[11px] font-mono text-[#bbbbbb] border-l border-[#3c3c3c] pl-4 uppercase font-light">
+            <span
+                class="hidden sm:inline-block text-[11px] font-mono text-[#bbbbbb] border-l border-[#3c3c3c] pl-4 uppercase font-light">
                 STEGANOGRAPHY DEMO PANEL
             </span>
         </div>
@@ -58,12 +64,15 @@
         <div class="flex items-center gap-6">
             <div class="hidden md:flex items-center gap-5 text-[12px] font-bold tracking-[1.5px] uppercase font-mono">
                 <a href="/" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">HOME</a>
-                <a href="/demo/crypto" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">CRYPTO DEMO</a>
-                <a href="/demo/codec" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">CODEC DEMO</a>
+                <a href="/demo/crypto" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">CRYPTO
+                    DEMO</a>
+                <a href="/demo/codec" class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">CODEC
+                    DEMO</a>
                 <span class="text-[#ffffff] border-b border-white pb-1">STEGO DEMO</span>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-[10px] font-mono text-[#e22718] bg-[#e22718]/10 px-2.5 py-0.5 rounded-sm border border-[#e22718]/30 tracking-widest uppercase font-bold animate-pulse">
+                <span
+                    class="text-[10px] font-mono text-[#e22718] bg-[#e22718]/10 px-2.5 py-0.5 rounded-sm border border-[#e22718]/30 tracking-widest uppercase font-bold animate-pulse">
                     LSB ACTIVE
                 </span>
             </div>
@@ -80,41 +89,52 @@
                 LSB Steganography & Scrambling
             </h1>
             <p class="text-[14px] font-light text-[#bbbbbb] max-w-2xl leading-relaxed">
-                Modul ini mendemonstrasikan penyisipan data ke dalam bit paling akhir (LSB) dari data warna piksel secara acak (Scrambling). Anda dapat melacak koordinat piksel RGB mana saja yang berubah nilainya secara langsung.
+                Modul ini mendemonstrasikan penyisipan data ke dalam bit paling akhir (LSB) dari data warna piksel
+                secara acak (Scrambling). Anda dapat melacak koordinat piksel RGB mana saja yang berubah nilainya secara
+                langsung.
             </p>
         </div>
     </header>
 
     <!-- CORE WORKSPACE -->
     <main class="max-w-7xl mx-auto w-full px-6 lg:px-12 py-12 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12">
-        
+
         <!-- ENCODER -->
         <section class="bg-[#0d0d0d] border border-[#262626] p-6 relative flex flex-col justify-between">
             <div class="absolute top-0 right-0 w-16 h-[2px] bg-[#e22718]"></div>
             <div>
-                <span class="text-[10px] font-mono text-[#bbbbbb] tracking-widest uppercase block mb-4">[ STEGO_ENCODE_UNIT ]</span>
+                <span class="text-[10px] font-mono text-[#bbbbbb] tracking-widest uppercase block mb-4">[
+                    STEGO_ENCODE_UNIT ]</span>
                 <h2 class="text-xl font-bold uppercase tracking-tight text-white mb-6 flex items-center gap-2">
                     <i data-lucide="image" class="w-5 h-5 text-[#e22718]"></i>
                     PENYISIPAN PESAN (LSB ENCODE)
                 </h2>
-                
+
                 <div class="space-y-4">
                     <!-- File Upload -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">01. PILIH COVER IMAGE</label>
-                        <div class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer group">
-                            <input type="file" id="stego-encode-file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">01. PILIH COVER
+                            IMAGE</label>
+                        <div
+                            class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer group">
+                            <input type="file" id="stego-encode-file" accept="image/*"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
                             <!-- Empty State -->
                             <div id="stego-encode-empty" class="pointer-events-none flex flex-col items-center">
-                                <i data-lucide="upload-cloud" class="w-7 h-7 text-[#bbbbbb] group-hover:text-white transition-colors mb-1.5 font-light"></i>
-                                <span class="text-[11px] text-[#ffffff] font-bold tracking-wide">PILIH COVER IMAGE (PNG/JPG)</span>
+                                <i data-lucide="upload-cloud"
+                                    class="w-7 h-7 text-[#bbbbbb] group-hover:text-white transition-colors mb-1.5 font-light"></i>
+                                <span class="text-[11px] text-[#ffffff] font-bold tracking-wide">PILIH COVER IMAGE
+                                    (PNG/JPG)</span>
                             </div>
 
                             <!-- Selected State -->
-                            <div id="stego-encode-info" class="relative z-20 pointer-events-none flex flex-col items-center hidden">
-                                <img id="stego-encode-preview" src="" alt="Preview" class="max-h-20 w-auto object-contain border border-[#3c3c3c] mb-2 preview-img hidden">
-                                <span id="stego-encode-filename" class="text-[11px] text-white font-bold max-w-[240px] truncate block">-</span>
+                            <div id="stego-encode-info"
+                                class="relative z-20 pointer-events-none flex flex-col items-center hidden">
+                                <img id="stego-encode-preview" src="" alt="Preview"
+                                    class="max-h-20 w-auto object-contain border border-[#3c3c3c] mb-2 preview-img hidden">
+                                <span id="stego-encode-filename"
+                                    class="text-[11px] text-white font-bold max-w-[240px] truncate block">-</span>
                             </div>
                         </div>
                     </div>
@@ -126,27 +146,34 @@
 
                     <!-- Secret Text Input -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">02. PESAN RAW (TANPA ENKRIPSI/KOMPRESI)</label>
-                        <textarea id="stego-message" placeholder="Teks yang Anda ketik akan diubah langsung ke bit biner mentah dan disisipkan..." class="w-full bg-[#000000] border border-[#3c3c3c] text-white p-3 text-xs font-mono h-20 focus:outline-none focus:border-white leading-relaxed"></textarea>
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">02. PESAN RAW
+                            (TANPA ENKRIPSI/KOMPRESI)</label>
+                        <textarea id="stego-message"
+                            placeholder="Teks yang Anda ketik akan diubah langsung ke bit biner mentah dan disisipkan..."
+                            class="w-full bg-[#000000] border border-[#3c3c3c] text-white p-3 text-xs font-mono h-20 focus:outline-none focus:border-white leading-relaxed"></textarea>
                     </div>
 
                     <!-- Password Seed -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">03. SEED KUNCI PENGACAK LSB (OPTIONAL)</label>
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">03. SEED KUNCI
+                            PENGACAK LSB (OPTIONAL)</label>
                         <div class="relative">
-                            <input type="password" id="stego-encode-password" placeholder="PASSWORD UNTUK SEED" class="w-full bg-[#000000] border border-[#3c3c3c] text-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-white">
+                            <input type="password" id="stego-encode-password" placeholder="PASSWORD UNTUK SEED"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-white">
                             <i data-lucide="shuffle" class="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#3c3c3c]"></i>
                         </div>
                     </div>
 
-                    <button type="button" id="stego-encode-btn" class="w-full bg-white hover:bg-[#bbbbbb] text-black font-extrabold py-2.5 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
+                    <button type="button" id="stego-encode-btn"
+                        class="w-full bg-white hover:bg-[#bbbbbb] text-black font-extrabold py-2.5 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                         <i data-lucide="shield" class="w-4 h-4 text-black"></i>
                         SISIPKAN PESAN KE LSB
                     </button>
 
                     <!-- Download stego -->
                     <div id="stego-encode-result" class="hidden pt-4 border-t border-[#262626] flex gap-4">
-                        <a id="stego-download-link" href="#" class="flex-1 bg-[#1c69d4] hover:bg-blue-600 text-white font-extrabold py-3 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-blue-400/50">
+                        <a id="stego-download-link" href="#"
+                            class="flex-1 bg-[#1c69d4] hover:bg-blue-600 text-white font-extrabold py-3 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-blue-400/50">
                             <i data-lucide="download" class="w-4 h-4"></i>
                             UNDUH GAMBAR STEGO
                         </a>
@@ -159,52 +186,68 @@
         <section class="bg-[#0d0d0d] border border-[#262626] p-6 relative flex flex-col justify-between">
             <div class="absolute top-0 right-0 w-16 h-[2px] bg-[#1c69d4]"></div>
             <div>
-                <span class="text-[10px] font-mono text-[#bbbbbb] tracking-widest uppercase block mb-4">[ STEGO_DECODE_UNIT ]</span>
+                <span class="text-[10px] font-mono text-[#bbbbbb] tracking-widest uppercase block mb-4">[
+                    STEGO_DECODE_UNIT ]</span>
                 <h2 class="text-xl font-bold uppercase tracking-tight text-white mb-6 flex items-center gap-2">
                     <i data-lucide="search" class="w-5 h-5 text-[#1c69d4]"></i>
                     BONGKAR PESAN (LSB DECODE)
                 </h2>
-                
+
                 <div class="space-y-4">
                     <!-- File Upload -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">01. UNGGAH GAMBAR STEGO</label>
-                        <div class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer group">
-                            <input type="file" id="stego-decode-file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                            
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">01. UNGGAH GAMBAR
+                            STEGO</label>
+                        <div
+                            class="relative border border-[#3c3c3c] bg-[#000000] p-6 text-center hover:border-white transition-all flex flex-col items-center justify-center min-h-[120px] cursor-pointer group">
+                            <input type="file" id="stego-decode-file" accept="image/*"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
                             <!-- Empty State -->
                             <div id="stego-decode-empty" class="pointer-events-none flex flex-col items-center">
-                                <i data-lucide="upload-cloud" class="w-7 h-7 text-[#bbbbbb] group-hover:text-white transition-colors mb-1.5 font-light"></i>
-                                <span class="text-[11px] text-[#60a5fa] font-bold tracking-wide">PILIH STEGO IMAGE</span>
+                                <i data-lucide="upload-cloud"
+                                    class="w-7 h-7 text-[#bbbbbb] group-hover:text-white transition-colors mb-1.5 font-light"></i>
+                                <span class="text-[11px] text-[#60a5fa] font-bold tracking-wide">PILIH STEGO
+                                    IMAGE</span>
                             </div>
 
                             <!-- Selected State -->
-                            <div id="stego-decode-info" class="relative z-20 pointer-events-none flex flex-col items-center hidden">
-                                <img id="stego-decode-preview" src="" alt="Preview" class="max-h-20 w-auto object-contain border border-[#3c3c3c] mb-2 preview-img hidden">
-                                <span id="stego-decode-filename" class="text-[11px] text-white font-bold max-w-[240px] truncate block">-</span>
+                            <div id="stego-decode-info"
+                                class="relative z-20 pointer-events-none flex flex-col items-center hidden">
+                                <img id="stego-decode-preview" src="" alt="Preview"
+                                    class="max-h-20 w-auto object-contain border border-[#3c3c3c] mb-2 preview-img hidden">
+                                <span id="stego-decode-filename"
+                                    class="text-[11px] text-white font-bold max-w-[240px] truncate block">-</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Password Seed -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">02. SEED KUNCI PENGACAK LSB (COCOKKAN SEED ENCODE)</label>
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">02. SEED KUNCI
+                            PENGACAK LSB (COCOKKAN SEED ENCODE)</label>
                         <div class="relative">
-                            <input type="password" id="stego-decode-password" placeholder="PASSWORD UNTUK SEED" class="w-full bg-[#000000] border border-[#3c3c3c] text-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-white">
+                            <input type="password" id="stego-decode-password" placeholder="PASSWORD UNTUK SEED"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white px-3 py-2 text-xs font-mono focus:outline-none focus:border-white">
                             <i data-lucide="shuffle" class="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#3c3c3c]"></i>
                         </div>
                     </div>
 
-                    <button type="button" id="stego-decode-btn" class="w-full border border-white hover:bg-white hover:text-black text-white font-extrabold py-2.5 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
+                    <button type="button" id="stego-decode-btn"
+                        class="w-full border border-white hover:bg-white hover:text-black text-white font-extrabold py-2.5 text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                         PROSES EKSTRAKSI LSB
                     </button>
 
                     <!-- Decoded Output -->
                     <div class="flex flex-col gap-1.5 pt-4">
-                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">Extracted Plaintext (Hasil Ekstraksi LSB)</label>
-                        <div class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px] overflow-y-auto max-h-[140px]">
-                            <p id="stego-decode-result" class="text-green-400 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">-</p>
+                        <label class="text-[10px] font-mono tracking-wider text-slate-400 uppercase">Extracted Plaintext
+                            (Hasil Ekstraksi LSB)</label>
+                        <div
+                            class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px] overflow-y-auto max-h-[140px]">
+                            <p id="stego-decode-result"
+                                class="text-green-400 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">
+                                -</p>
                         </div>
                     </div>
                 </div>
@@ -218,10 +261,12 @@
         <div class="bg-[#0d0d0d] border border-[#262626] p-6 flex flex-col justify-between">
             <div class="font-mono text-xs space-y-4">
                 <div class="flex justify-between items-center border-b border-[#262626] pb-2">
-                    <span class="text-[11px] text-slate-500 uppercase tracking-widest block">// LSB RGB PIXEL ALTERATION TRACKING LOGGER</span>
-                    <span id="stego-pixels-changed-count" class="text-red-500 font-bold">TOTAL PIXEL BERUBAH: 0 PIXEL</span>
+                    <span class="text-[11px] text-slate-500 uppercase tracking-widest block">// LSB RGB PIXEL ALTERATION
+                        TRACKING LOGGER</span>
+                    <span id="stego-pixels-changed-count" class="text-red-500 font-bold">TOTAL PIXEL BERUBAH: 0
+                        PIXEL</span>
                 </div>
-                
+
                 <!-- Table of altered pixels -->
                 <div class="overflow-x-auto max-h-[300px] overflow-y-auto">
                     <table class="w-full text-left border-collapse">
@@ -237,7 +282,8 @@
                         </thead>
                         <tbody id="stego-pixel-log-body">
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-slate-600 uppercase">Belum ada aktivitas. Unggah berkas cover dan tekan tombol penyisipan untuk memicu logger piksel.</td>
+                                <td colspan="6" class="py-8 text-center text-slate-600 uppercase">Belum ada aktivitas.
+                                    Unggah berkas cover dan tekan tombol penyisipan untuk memicu logger piksel.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -247,7 +293,8 @@
     </section>
 
     <!-- BRUTALIST INDUSTRIAL FOOTER -->
-    <footer class="bg-[#000000] border-t border-[#262626] py-8 px-6 lg:px-12 text-center text-[10px] font-mono text-slate-500 tracking-[0.3em] uppercase select-none mt-auto">
+    <footer
+        class="bg-[#000000] border-t border-[#262626] py-8 px-6 lg:px-12 text-center text-[10px] font-mono text-slate-500 tracking-[0.3em] uppercase select-none mt-auto">
         STEGODEC MOTORSPORT COURIER CO — STEGO MODULE v2.04
     </footer>
 
@@ -259,4 +306,5 @@
     <!-- Custom Application Logic -->
     <script src="/static/js/demo_stego.js"></script>
 </body>
+
 </html>
