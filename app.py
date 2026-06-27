@@ -681,6 +681,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/protocol-labs')
+def protocol_labs():
+    """Halaman Protocol Labs (Agent Handbook)"""
+    return render_template('protocol_labs.html')
+
+
 # ==========================================
 # ROUTING API BARU (AUDIO / VIDEO / CODEC)
 # ==========================================

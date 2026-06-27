@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegoDec — Protocol Labs (Agent Handbook)</title>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body
+    class="min-h-screen bg-[#000000] text-[#ffffff] font-sans flex flex-col selection:bg-[#e22718] selection:text-white overflow-x-hidden antialiased">
+
+    <!-- M Tricolor Divider pinned at the top -->
+    <div class="fixed top-0 left-0 w-full z-50">
+        <div class="flex h-1 w-full overflow-hidden select-none">
+            <div class="bg-[#0066b1] h-full flex-1"></div>
+            <div class="bg-[#1c69d4] h-full flex-1"></div>
+            <div class="bg-[#e22718] h-full flex-1"></div>
+        </div>
+    </div>
+
+    <!-- TOP NAVIGATION CHROME -->
+    <nav class="h-16 border-b border-[#262626] bg-[#000000] flex items-center justify-between px-6 lg:px-12 mt-1 z-40">
+        <div class="flex items-center gap-4">
+            <a href="/" class="flex items-center gap-1.5 font-bold tracking-tighter text-xl">
+                <span class="text-white font-black italic tracking-widest text-[#ffffff]">STEGO</span>
+                <span class="text-white italic tracking-widest font-light mr-1">DEC</span>
+                <div class="flex flex-col gap-[2px] w-6 h-5 justify-center">
+                    <div class="h-[3px] w-full bg-[#0066b1]"></div>
+                    <div class="h-[3px] w-[85%] bg-[#1c69d4]"></div>
+                    <div class="h-[3px] w-[70%] bg-[#e22718]"></div>
+                </div>
+            </a>
+            <span
+                class="hidden sm:inline-block text-[11px] font-mono text-[#bbbbbb] border-l border-[#3c3c3c] pl-4 uppercase font-light">
+                INTEGRATED STEGANOGRAPHY CORE
+            </span>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="hidden md:flex items-center gap-5 text-[12px] font-bold tracking-[1.5px] uppercase font-mono">
+                <a href="/" class="text-[#bbbbbb] hover:text-white transition-colors">DASHBOARD</a>
+                <span class="text-[#ffffff] border-b border-white pb-1">PROTOCOL LABS</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span
+                    class="text-[10px] font-mono text-[#e22718] bg-[#e22718]/10 px-2.5 py-0.5 rounded-sm border border-[#e22718]/30 tracking-widest uppercase font-bold animate-pulse">
+                    LINE SECURED
+                </span>
+                <span class="text-[10px] font-mono text-[#bbbbbb]">V2.04</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN HANDBOOK CONTENT -->
+    <main class="max-w-7xl mx-auto w-full px-6 lg:px-12 py-16 flex-1 flex flex-col justify-center">
+        <div class="border-b border-[#262626] pb-6 mb-12">
+            <span class="text-[13px] font-bold tracking-[3px] text-[#0066b1] uppercase font-mono block mb-2">
+                // CRYPTOGRAPHIC COMMUNICATIONS PROTOCOL
+            </span>
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight text-white mb-4">
+                STEGODEC PROTOCOL LABS
+            </h1>
+            <p class="text-slate-400 font-light text-sm max-w-2xl leading-relaxed">
+                Panduan resmi operasional agen intelijen (Agent Handbook) untuk melakukan proses penyembunyian pesan (hushing), transmisi media carrier, dan ekstraksi secara aman.
+            </p>
+        </div>
+
+        <!-- 3 Pillars Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs font-mono text-[#bbbbbb] leading-relaxed">
+            <!-- Pillar 1 -->
+            <div class="bg-[#050505] border border-[#262626] p-8 relative flex flex-col justify-between min-h-[300px]">
+                <div class="absolute top-0 left-0 w-[3px] h-full bg-[#0066b1]"></div>
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-white font-extrabold uppercase tracking-widest text-[12px]">
+                            01_ALUR PENYANDIAN (ENCODER)
+                        </span>
+                        <i data-lucide="shield" class="w-5 h-5 text-[#0066b1]"></i>
+                    </div>
+                    <p class="font-light text-justify leading-relaxed">
+                        Unggah file utama Anda sebagai penyamar (cover) pesan rahasia di dalam form pembungkus. Ketikkan
+                        pesan inti yang ingin diisikan. Agar terlindung dari analisis visual yang tajam, kami sarankan
+                        Anda memasang Kata Sandi pembuka. Tekan tombol 'PROCESS & HUSH' untuk memicu enkripsi, kompresi
+                        lossless zlib, dan penyisipan bit LSB.
+                    </p>
+                </div>
+                <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
+                    SYSTEM_PHASE: INGESTION
+                </div>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="bg-[#050505] border border-[#262626] p-8 relative flex flex-col justify-between min-h-[300px]">
+                <div class="absolute top-0 left-0 w-[3px] h-full bg-[#1c69d4]"></div>
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-white font-extrabold uppercase tracking-widest text-[12px]">
+                            02_PENGIRIMAN CARRIER (MEDIA STEGO)
+                        </span>
+                        <i data-lucide="send" class="w-5 h-5 text-[#1c69d4]"></i>
+                    </div>
+                    <p class="font-light text-justify leading-relaxed">
+                        Setelah dokumen stego berhasil diunduh, Anda dapat membagikannya kepada penerima melalui saluran
+                        komunikasi yang aman (seperti email atau pesan instan). Format PNG menjaga integritas bit piksel
+                        steganografi dari degradasi kompresi lossy.
+                    </p>
+                </div>
+                <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
+                    SYSTEM_PHASE: TRANSMISSION
+                </div>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="bg-[#050505] border border-[#262626] p-8 relative flex flex-col justify-between min-h-[300px]">
+                <div class="absolute top-0 left-0 w-[3px] h-full bg-[#e22718]"></div>
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-white font-extrabold uppercase tracking-widest text-[12px]">
+                            03_EKSTRAKSI DAN BONGKAR (DECODER)
+                        </span>
+                        <i data-lucide="key" class="w-5 h-5 text-[#e22718]"></i>
+                    </div>
+                    <p class="font-light text-justify leading-relaxed">
+                        Penerima mengunduh lampiran Anda, membuka modul pembongkar di panel sisi kanan StegoDec,
+                        melaraskan file tersebut, menyematkan Kunci Kata Sandi yang tepat, dan mengetuk 'START
+                        EXTRACTION'. Sistem StegoDec-core akan mendeteksi penanda khusus steganografi dan memulihkan
+                        payload pesan asli.
+                    </p>
+                </div>
+                <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
+                    SYSTEM_PHASE: EXTRACTION
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action back to dashboard -->
+        <div class="mt-12 text-center">
+            <a href="/" class="inline-flex items-center gap-2 border border-white text-white hover:bg-white hover:text-black font-extrabold px-6 py-3 text-xs tracking-[2px] uppercase rounded-none transition-all cursor-pointer">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Dashboard
+            </a>
+        </div>
+    </main>
+
+    <!-- BRUTALIST INDUSTRIAL FOOTER -->
+    <footer class="bg-[#000000] border-t border-[#262626] py-12 px-6 lg:px-12 mt-auto">
+        <div
+            class="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-[11px] font-mono text-[#bbbbbb] font-light">
+
+            <div class="space-y-1.5 text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="text-white font-black italic tracking-wider text-xs">STEGODEC</span>
+                    <span class="text-[#3c3c3c]">|</span>
+                    <span class="text-white uppercase font-bold text-[10px]">COURIER TEAM INDUSTRIAL</span>
+                </div>
+                <p class="text-[10px] uppercase tracking-wide">
+                    Secure Communications Platform // Manufactured in strict accordance with cryptographic compliance.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-x-8 gap-y-2 text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                <div>
+                    ACCURACY_LIMITS: <span class="text-green-400">100% BIT PERFECT</span>
+                </div>
+                <div>
+                    CODEC_COMPRESSION: <span class="text-white">LOSSLESS ZLIB</span>
+                </div>
+                <div>
+                    CRYPTO_INTEGRITY: <span class="text-[#0066b1]">VIGENERE-XOR Cipher</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div
+            class="max-w-7xl mx-auto w-full text-center mt-12 text-[9px] text-[#3c3c3c] tracking-[0.4em] uppercase select-none">
+            STEGODEC MOTORSPORT COURIER CO — PROPRIETARY LABS INTERFACE v2.04
+        </div>
+    </footer>
+
+    <!-- Lucide Icon Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
