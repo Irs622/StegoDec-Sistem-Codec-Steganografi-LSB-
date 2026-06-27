@@ -63,13 +63,7 @@
 
         <div class="flex items-center gap-6">
             <div class="hidden md:flex items-center gap-5 text-[12px] font-bold tracking-[1.5px] uppercase font-mono">
-                <a href="/" class="text-[#ffffff] border-b border-white pb-1">INTEGRASI</a>
-                <a href="/demo/crypto"
-                    class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">DEMO_CRYPTO</a>
-                <a href="/demo/codec"
-                    class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">DEMO_CODEC</a>
-                <a href="/demo/stego"
-                    class="text-[#muted] opacity-60 hover:opacity-100 transition-opacity">DEMO_STEGO</a>
+                <span class="text-[#ffffff] border-b border-[#262626] pb-1">DASHBOARD INTEGRASI</span>
             </div>
             <div class="flex items-center gap-3">
                 <span
@@ -128,84 +122,7 @@
         </div>
     </section>
 
-    <!-- PILAR FITUR MANDIRI (DEMOS) -->
-    <section class="max-w-7xl mx-auto w-full px-6 lg:px-12 pt-16">
-        <div class="border-b border-[#262626] pb-4 mb-8">
-            <span class="text-[11px] font-bold tracking-[2px] text-[#e22718] uppercase font-mono block mb-1">
-                // DEMO PILAR FITUR MANDIRI
-            </span>
-            <h3 class="text-xl font-bold uppercase tracking-tight text-white">
-                Eksperimen Algoritma Secara Terpisah
-            </h3>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Crypto Card -->
-            <a href="/demo/crypto"
-                class="bg-[#0d0d0d] border border-[#262626] p-6 hover:border-white transition-all group flex flex-col justify-between min-h-[160px]">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <i data-lucide="lock" class="w-6 h-6 text-[#e22718]"></i>
-                        <span class="text-[9px] font-mono text-slate-500 uppercase">PILAR 01</span>
-                    </div>
-                    <h4
-                        class="text-sm font-bold uppercase tracking-wider text-white mb-2 group-hover:text-[#e22718] transition-colors font-mono">
-                        Kriptografi Vigenere-XOR
-                    </h4>
-                    <p class="text-[11px] font-light text-[#bbbbbb] leading-relaxed">
-                        Demonstrasi penyandian bitwise XOR dan dynamic salt acak berbasis password.
-                    </p>
-                </div>
-                <div class="flex items-center gap-1 text-[10px] font-mono text-white mt-4 font-bold">
-                    BUKA DEMO <i data-lucide="arrow-right"
-                        class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
 
-            <!-- Codec Card -->
-            <a href="/demo/codec"
-                class="bg-[#0d0d0d] border border-[#262626] p-6 hover:border-white transition-all group flex flex-col justify-between min-h-[160px]">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <i data-lucide="archive" class="w-6 h-6 text-[#0066b1]"></i>
-                        <span class="text-[9px] font-mono text-slate-500 uppercase">PILAR 02</span>
-                    </div>
-                    <h4
-                        class="text-sm font-bold uppercase tracking-wider text-white mb-2 group-hover:text-[#0066b1] transition-colors font-mono">
-                        Lossless Codec (Zlib)
-                    </h4>
-                    <p class="text-[11px] font-light text-[#bbbbbb] leading-relaxed">
-                        Eksperimen kompresi teks Deflate zlib, visualisasi byte size, dan hex dump.
-                    </p>
-                </div>
-                <div class="flex items-center gap-1 text-[10px] font-mono text-white mt-4 font-bold">
-                    BUKA DEMO <i data-lucide="arrow-right"
-                        class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- Stego Card -->
-            <a href="/demo/stego"
-                class="bg-[#0d0d0d] border border-[#262626] p-6 hover:border-white transition-all group flex flex-col justify-between min-h-[160px]">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <i data-lucide="image" class="w-6 h-6 text-[#1c69d4]"></i>
-                        <span class="text-[9px] font-mono text-slate-500 uppercase">PILAR 03</span>
-                    </div>
-                    <h4
-                        class="text-sm font-bold uppercase tracking-wider text-white mb-2 group-hover:text-[#1c69d4] transition-colors font-mono">
-                        Steganografi LSB
-                    </h4>
-                    <p class="text-[11px] font-light text-[#bbbbbb] leading-relaxed">
-                        Penyisipan bit LSB teracak (PRNG) ke piksel gambar lengkap dengan log koordinat RGB.
-                    </p>
-                </div>
-                <div class="flex items-center gap-1 text-[10px] font-mono text-white mt-4 font-bold">
-                    BUKA DEMO <i data-lucide="arrow-right"
-                        class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-        </div>
-    </section>
 
     <!-- HUB NAVIGASI TAB UTAMA (MEDIA HUB) -->
     <section class="max-w-7xl mx-auto w-full px-6 lg:px-12 pt-8">
@@ -221,6 +138,10 @@
             <button type="button" id="tab-video-btn" onclick="switchMediaTab('video')"
                 class="flex-1 min-w-[120px] py-3 text-xs font-mono font-bold tracking-[2px] uppercase rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer bg-[#000000] text-[#bbbbbb] hover:text-white border border-transparent hover:border-[#3c3c3c]">
                 <i data-lucide="film" class="w-4 h-4"></i> Video Hub
+            </button>
+            <button type="button" id="tab-sandbox-btn" onclick="switchMediaTab('sandbox')"
+                class="flex-1 min-w-[120px] py-3 text-xs font-mono font-bold tracking-[2px] uppercase rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer bg-[#000000] text-[#bbbbbb] hover:text-white border border-transparent hover:border-[#3c3c3c]">
+                <i data-lucide="settings" class="w-4 h-4"></i> Sandbox Tools
             </button>
         </div>
     </section>
@@ -447,6 +368,91 @@
                                     <option value="24">24 FPS (Bioskop)</option>
                                     <option value="30">30 FPS (Mulus / Original)</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SANDBOX CRYPTO MODE PANEL -->
+                <div id="encoder-sandbox-panel" class="space-y-6 hidden">
+                    <!-- Sandbox Mode selector: Encrypt vs Decrypt -->
+                    <div class="flex border-b border-[#262626] mb-6 font-mono text-[11px] font-bold">
+                        <button type="button" id="sandbox-crypto-mode-encrypt" onclick="switchSandboxCryptoMode('encrypt')"
+                            class="flex-1 pb-2 text-center text-[#e22718] border-b-2 border-[#e22718] tracking-widest uppercase transition-all">
+                            🔒 ENCRYPT
+                        </button>
+                        <button type="button" id="sandbox-crypto-mode-decrypt" onclick="switchSandboxCryptoMode('decrypt')"
+                            class="flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all">
+                            🔓 DECRYPT
+                        </button>
+                    </div>
+
+                    <!-- Sandbox Encrypt Form -->
+                    <div id="sandbox-crypto-encrypt-form" class="space-y-4">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                INPUT PLAINTEXT (TEKS ASLI)
+                            </label>
+                            <textarea id="sandbox-encrypt-message" placeholder="Masukkan pesan rahasia yang ingin dienkripsi..."
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white p-3 text-xs font-mono h-24 rounded-none leading-relaxed"></textarea>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                KATA SANDI (KEY PASSWORD)
+                            </label>
+                            <input type="password" id="sandbox-encrypt-password" placeholder="SANDI ENKRIPSI"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white px-3 py-2 text-xs font-mono rounded-none" />
+                        </div>
+                        <button type="button" id="sandbox-encrypt-btn"
+                            class="w-full bg-white text-black font-extrabold hover:bg-[#bbbbbb] py-3 text-xs tracking-[2px] uppercase rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="lock" class="w-4 h-4 fill-black text-black"></i>
+                            PROSES ENKRIPSI
+                        </button>
+                        <div class="flex flex-col gap-2 pt-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                CIPHERTEXT OUTPUT (BASE64)
+                            </label>
+                            <div class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px]">
+                                <button type="button" id="sandbox-copy-encrypt-btn" onclick="copyText('sandbox-encrypt-result', 'sandbox-copy-encrypt-btn')"
+                                    class="absolute right-2 top-2 p-1 bg-[#111111] hover:bg-[#333333] border border-[#3c3c3c] text-white">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <p id="sandbox-encrypt-result" class="text-amber-500 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Decrypt Form -->
+                    <div id="sandbox-crypto-decrypt-form" class="space-y-4 hidden">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                INPUT CIPHERTEXT (BASE64)
+                            </label>
+                            <textarea id="sandbox-decrypt-message" placeholder="Masukkan ciphertext Base64 yang diawali dengan SECURE_..."
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white p-3 text-xs font-mono h-24 rounded-none leading-relaxed"></textarea>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                KATA SANDI (KEY PASSWORD)
+                            </label>
+                            <input type="password" id="sandbox-decrypt-password" placeholder="SANDI DEKRIPSI"
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white px-3 py-2 text-xs font-mono rounded-none" />
+                        </div>
+                        <button type="button" id="sandbox-decrypt-btn"
+                            class="w-full bg-white text-black font-extrabold hover:bg-[#bbbbbb] py-3 text-xs tracking-[2px] uppercase rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="unlock" class="w-4 h-4 fill-black text-black"></i>
+                            PROSES DEKRIPSI
+                        </button>
+                        <div class="flex flex-col gap-2 pt-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                DECRYPTED PLAINTEXT RESULT
+                            </label>
+                            <div class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px]">
+                                <button type="button" id="sandbox-copy-decrypt-btn" onclick="copyText('sandbox-decrypt-result', 'sandbox-copy-decrypt-btn')"
+                                    class="absolute right-2 top-2 p-1 bg-[#111111] hover:bg-[#333333] border border-[#3c3c3c] text-white">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <p id="sandbox-decrypt-result" class="text-green-400 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">-</p>
                             </div>
                         </div>
                     </div>
@@ -704,6 +710,89 @@
                                 <div id="inspect-details-table" class="space-y-2 text-[11px] text-[#bbbbbb]">
                                     <!-- Dynamic rows inserted by JS -->
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SANDBOX CODEC MODE PANEL -->
+                <div id="decoder-sandbox-panel" class="space-y-6 hidden">
+                    <!-- Sandbox Codec Selector: Compress vs Decompress -->
+                    <div class="flex border-b border-[#262626] mb-6 font-mono text-[11px] font-bold">
+                        <button type="button" id="sandbox-codec-mode-compress" onclick="switchSandboxCodecMode('compress')"
+                            class="flex-1 pb-2 text-center text-[#60a5fa] border-b-2 border-[#60a5fa] tracking-widest uppercase transition-all">
+                            🗜️ COMPRESS
+                        </button>
+                        <button type="button" id="sandbox-codec-mode-decompress" onclick="switchSandboxCodecMode('decompress')"
+                            class="flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all">
+                            📂 DECOMPRESS
+                        </button>
+                    </div>
+
+                    <!-- Sandbox Compress Form -->
+                    <div id="sandbox-codec-compress-form" class="space-y-4">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                INPUT PLAINTEXT (TEKS PANJANG)
+                            </label>
+                            <textarea id="sandbox-compress-text" placeholder="Masukkan teks panjang yang ingin dikompresi..."
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white p-3 text-xs font-mono h-24 rounded-none leading-relaxed"></textarea>
+                        </div>
+                        <button type="button" id="sandbox-compress-btn"
+                            class="w-full border border-white text-white hover:bg-white hover:text-black font-extrabold py-3 text-xs tracking-[2px] transition-all uppercase rounded-none cursor-pointer">
+                            PROSES KOMPRESI
+                        </button>
+                        <div class="flex flex-col gap-2 pt-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                COMPRESSED HEX DUMP OUTPUT
+                            </label>
+                            <div class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px]">
+                                <button type="button" id="sandbox-copy-hex-btn" onclick="copyText('sandbox-compress-hex-result', 'sandbox-copy-hex-btn')"
+                                    class="absolute right-2 top-2 p-1 bg-[#111111] hover:bg-[#333333] border border-[#3c3c3c] text-white">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <p id="sandbox-compress-hex-result" class="text-blue-400 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">-</p>
+                            </div>
+                        </div>
+                        <div id="sandbox-compress-stats" class="hidden grid grid-cols-3 gap-2 text-center font-mono text-[10px] border border-[#262626] p-2 bg-[#050505]">
+                            <div>
+                                <span class="text-slate-500 block uppercase">ASLI</span>
+                                <span id="sandbox-stat-orig" class="text-white font-bold">- B</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block uppercase">KOMPRES</span>
+                                <span id="sandbox-stat-comp" class="text-white font-bold">- B</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block uppercase">RASIO</span>
+                                <span id="sandbox-stat-ratio" class="text-green-400 font-bold">-%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Decompress Form -->
+                    <div id="sandbox-codec-decompress-form" class="space-y-4 hidden">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                INPUT COMPRESSED HEX DATA
+                            </label>
+                            <textarea id="sandbox-decompress-hex" placeholder="Masukkan hex data terkompresi..."
+                                class="w-full bg-[#000000] border border-[#3c3c3c] text-white focus:outline-none focus:border-white p-3 text-xs font-mono h-24 rounded-none leading-relaxed"></textarea>
+                        </div>
+                        <button type="button" id="sandbox-decompress-btn"
+                            class="w-full border border-white text-white hover:bg-white hover:text-black font-extrabold py-3 text-xs tracking-[2px] transition-all uppercase rounded-none cursor-pointer">
+                            PROSES DEKOMPRESI
+                        </button>
+                        <div class="flex flex-col gap-2 pt-2">
+                            <label class="text-[11px] font-bold tracking-[1px] text-white uppercase font-mono">
+                                DECOMPRESSED TEXT OUTPUT
+                            </label>
+                            <div class="bg-[#000000] border border-[#3c3c3c] p-3 font-mono text-xs relative min-h-[80px]">
+                                <button type="button" id="sandbox-copy-decomp-btn" onclick="copyText('sandbox-decompress-result', 'sandbox-copy-decomp-btn')"
+                                    class="absolute right-2 top-2 p-1 bg-[#111111] hover:bg-[#333333] border border-[#3c3c3c] text-white">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <p id="sandbox-decompress-result" class="text-green-400 font-bold break-all leading-relaxed whitespace-pre-wrap select-text">-</p>
                             </div>
                         </div>
                     </div>

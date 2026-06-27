@@ -919,13 +919,8 @@ def codec_compress_video():
 
 
 # ==========================================
-# ROUTING DEMO FITUR MANDIRI
+# STANDALONE SANDBOX API ENDPOINTS
 # ==========================================
-
-@app.route('/demo/crypto')
-def demo_crypto():
-    """Halaman demo kriptografi mandiri"""
-    return render_template('demo_crypto.html')
 
 @app.route('/demo/crypto/encrypt', methods=['POST'])
 def demo_crypto_encrypt():
@@ -956,10 +951,7 @@ def demo_crypto_decrypt():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route('/demo/codec')
-def demo_codec():
-    """Halaman demo kompresi mandiri"""
-    return render_template('demo_codec.html')
+
 
 @app.route('/demo/codec/compress', methods=['POST'])
 def demo_codec_compress():
@@ -997,137 +989,6 @@ def demo_codec_decompress():
     except Exception as e:
         return jsonify({"success": False, "error": f"Dekompresi gagal: {str(e)}"}), 400
 
-
-@app.route('/demo/stego')
-def demo_stego():
-    """Halaman demo steganografi mandiri"""
-    return render_template('demo_stego.html')
-
-@app.route('/demo/stego/encode', methods=['POST'])
-def demo_stego_encode():
-    if 'file' not in request.files or 'message' not in request.form:
-        return jsonify({"success": False, "error": "Data tidak lengkap."}), 400
-    
-    file = request.files['file']
-    message = request.form['message'].strip()
-    password = request.form.get('password', '').strip() or None
-    
-    if not file.filename or not message:
-        return jsonify({"success": False, "error": "File dan pesan wajib diisi."}), 400
-    
-    safe_name = secure_filename(file.filename)
-    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'demo_in_{safe_name}')
-    result_name = f'stego_demo_{uuid.uuid4().hex[:8]}.png'
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], result_name)
-    
-    file.save(input_path)
-    
-    try:
-        raw_bytes = message.encode('utf-8')
-        payload = raw_bytes + DELIMITER
-        
-        payload_np = np.frombuffer(payload, dtype=np.uint8)
-        bits = np.unpackbits(payload_np)
-        n_bits = len(bits)
-        
-        img = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
-        if img is None:
-            raise ValueError("File gambar tidak didukung.")
-            
-        if len(img.shape) == 2:
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            
-        flat_img = img.flatten()
-        
-        if n_bits > len(flat_img):
-            raise ValueError(f"Gambar terlalu kecil. Butuh {n_bits} bit, kapasitas {len(flat_img)} bit.")
-            
-        scrambled_indices = get_scrambled_indices(len(flat_img), password)
-        target_indices = scrambled_indices[:n_bits]
-        
-        original_flat = flat_img.copy()
-        flat_img[target_indices] = (flat_img[target_indices] & 0xFE) | bits
-        
-        encoded_img = flat_img.reshape(img.shape)
-        cv2.imwrite(output_path, encoded_img)
-        
-        diff = np.where(original_flat != flat_img)[0]
-        changed_pixels_info = []
-        
-        height, width, channels = img.shape
-        for idx in diff[:60]:
-            ch = int(idx % channels)
-            temp = idx // channels
-            c = int(temp % width)
-            r = int(temp // width)
-            changed_pixels_info.append({
-                "row": r,
-                "col": c,
-                "channel": ch,
-                "old_val": int(original_flat[idx]),
-                "new_val": int(flat_img[idx])
-            })
-            
-        return jsonify({
-            'success': True,
-            'download_url': f'/download/{result_name}',
-            'filename': result_name,
-            'total_changed_pixels': len(diff),
-            'bits_embedded': n_bits,
-            'changed_pixels_sample': changed_pixels_info
-        })
-    except ValueError as ve:
-        return jsonify({"success": False, "error": str(ve)}), 400
-    except Exception as e:
-        return jsonify({"success": False, "error": f"Kesalahan: {str(e)}"}), 500
-    finally:
-        if os.path.exists(input_path):
-            os.remove(input_path)
-
-@app.route('/demo/stego/decode', methods=['POST'])
-def demo_stego_decode():
-    if 'file' not in request.files:
-        return jsonify({"success": False, "error": "Tidak ada file yang diunggah."}), 400
-    
-    file = request.files['file']
-    password = request.form.get('password', '').strip() or None
-    
-    if not file.filename:
-        return jsonify({"success": False, "error": "File tidak boleh kosong."}), 400
-        
-    safe_name = secure_filename(file.filename)
-    input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'demo_dec_{safe_name}')
-    file.save(input_path)
-    
-    try:
-        img = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
-        if img is None:
-            raise ValueError("Gagal membaca berkas gambar.")
-            
-        if len(img.shape) == 2:
-            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            
-        flat_img = img.flatten()
-        
-        scrambled_indices = get_scrambled_indices(len(flat_img), password)
-        lsb_bits = flat_img[scrambled_indices] & 1
-        
-        extracted_bytes = np.packbits(lsb_bits).tobytes()
-        delim_idx = extracted_bytes.find(DELIMITER)
-        
-        if delim_idx != -1:
-            raw_bytes = extracted_bytes[:delim_idx]
-            return jsonify({
-                'success': True,
-                'extracted_message': raw_bytes.decode('utf-8', errors='replace')
-            })
-            
-        return jsonify({'success': False, 'error': 'Bukan berkas stego (delimiter tidak ditemukan)'})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-    finally:
-        if os.path.exists(input_path):
-            os.remove(input_path)
 
 
 @app.route('/encode', methods=['POST'])

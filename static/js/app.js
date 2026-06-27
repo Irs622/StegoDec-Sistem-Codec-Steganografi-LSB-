@@ -606,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.switchMediaTab = function (tab) {
         currentMediaTab = tab;
         
-        const tabs = ['image', 'audio', 'video'];
+        const tabs = ['image', 'audio', 'video', 'sandbox'];
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-${t}-btn`);
             if (t === tab) {
@@ -616,32 +616,92 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
-        const moduleIds = {
-            image: ['IMAGE_HUB_ENCODER', 'IMAGE_HUB_DECODER'],
-            audio: ['AUDIO_HUB_ENCODER', 'AUDIO_HUB_DECODER'],
-            video: ['VIDEO_HUB_ENCODER', 'VIDEO_HUB_DECODER']
-        };
-        document.getElementById('encoder-module-id').textContent = `[ ${moduleIds[tab][0]} ]`;
-        document.getElementById('decoder-module-id').textContent = `[ ${moduleIds[tab][1]} ]`;
-        
+        const headerEncoderTab = document.getElementById('encoder-mode-stego')?.parentElement;
+        const headerDecoderTab = document.getElementById('decoder-mode-stego')?.parentElement;
+
+        if (tab === 'sandbox') {
+            document.getElementById('encoder-module-id').textContent = `[ STANDALONE_CRYPTOGRAPHY ]`;
+            document.getElementById('decoder-module-id').textContent = `[ STANDALONE_LOSSLESS_CODEC ]`;
+            
+            document.getElementById('encoder-title').innerHTML = `<span class="w-2.5 h-2.5 bg-[#e22718] inline-block rounded-none"></span> STANDALONE CRYPTOGRAPHY`;
+            document.getElementById('decoder-title').innerHTML = `<span class="w-2.5 h-2.5 bg-[#60a5fa] inline-block rounded-none"></span> STANDALONE LOSSLESS CODEC`;
+
+            document.getElementById('encoder-stego-panel').classList.add('hidden');
+            document.getElementById('encoder-codec-panel').classList.add('hidden');
+            document.getElementById('decoder-stego-panel').classList.add('hidden');
+            document.getElementById('decoder-codec-panel').classList.add('hidden');
+            
+            document.getElementById('encoder-sandbox-panel').classList.remove('hidden');
+            document.getElementById('decoder-sandbox-panel').classList.remove('hidden');
+
+            if (headerEncoderTab) headerEncoderTab.classList.add('hidden');
+            if (headerDecoderTab) headerDecoderTab.classList.add('hidden');
+            document.getElementById('encode-btn').classList.add('hidden');
+            document.getElementById('codec-btn').classList.add('hidden');
+            document.getElementById('encode-result').classList.add('hidden');
+            document.getElementById('codec-result').classList.add('hidden');
+            
+            document.getElementById('settings-image').classList.add('hidden');
+            document.getElementById('settings-audio').classList.add('hidden');
+            document.getElementById('settings-video').classList.add('hidden');
+        } else {
+            document.getElementById('encoder-title').innerHTML = `<span class="w-2.5 h-2.5 bg-[#e22718] inline-block rounded-none"></span> SEMBUNYIKAN PESAN RAHASIA (ENCODE)`;
+            document.getElementById('decoder-title').innerHTML = `<span class="w-2.5 h-2.5 bg-[#1c69d4] inline-block rounded-none"></span> BONGKAR PESAN RAHASIA (DECODE)`;
+
+            if (headerEncoderTab) headerEncoderTab.classList.remove('hidden');
+            if (headerDecoderTab) headerDecoderTab.classList.remove('hidden');
+
+            if (currentEncoderMode === 'stego') {
+                document.getElementById('encoder-stego-panel').classList.remove('hidden');
+                document.getElementById('encoder-codec-panel').classList.add('hidden');
+                document.getElementById('encode-btn').classList.remove('hidden');
+                document.getElementById('codec-btn').classList.add('hidden');
+            } else {
+                document.getElementById('encoder-stego-panel').classList.add('hidden');
+                document.getElementById('encoder-codec-panel').classList.remove('hidden');
+                document.getElementById('encode-btn').classList.add('hidden');
+                document.getElementById('codec-btn').classList.remove('hidden');
+            }
+
+            if (currentDecoderMode === 'stego') {
+                document.getElementById('decoder-stego-panel').classList.remove('hidden');
+                document.getElementById('decoder-codec-panel').classList.add('hidden');
+            } else {
+                document.getElementById('decoder-stego-panel').classList.add('hidden');
+                document.getElementById('decoder-codec-panel').classList.remove('hidden');
+            }
+
+            document.getElementById('encoder-sandbox-panel').classList.add('hidden');
+            document.getElementById('decoder-sandbox-panel').classList.add('hidden');
+
+            const moduleIds = {
+                image: ['IMAGE_HUB_ENCODER', 'IMAGE_HUB_DECODER'],
+                audio: ['AUDIO_HUB_ENCODER', 'AUDIO_HUB_DECODER'],
+                video: ['VIDEO_HUB_ENCODER', 'VIDEO_HUB_DECODER']
+            };
+            document.getElementById('encoder-module-id').textContent = `[ ${moduleIds[tab][0]} ]`;
+            document.getElementById('decoder-module-id').textContent = `[ ${moduleIds[tab][1]} ]`;
+
+            document.getElementById('settings-image').classList.add('hidden');
+            document.getElementById('settings-audio').classList.add('hidden');
+            document.getElementById('settings-video').classList.add('hidden');
+            document.getElementById(`settings-${tab}`).classList.remove('hidden');
+            
+            updateFileInputsForTab(tab);
+        }
+
         encoderFile = null;
         decoderFile = null;
         codecFile = null;
         inspectorFile = null;
         encoderImageCapacity = 0;
         
-        updateFileInputsForTab(tab);
-        
-        document.getElementById('settings-image').classList.add('hidden');
-        document.getElementById('settings-audio').classList.add('hidden');
-        document.getElementById('settings-video').classList.add('hidden');
-        document.getElementById(`settings-${tab}`).classList.remove('hidden');
-        
         resetAllPanelStates();
         lucide.createIcons();
     };
 
     function updateFileInputsForTab(tab) {
+        if (tab === 'sandbox') return;
         const acceptTypes = {
             image: { accept: 'image/png', label: '01. UNGGAH COVER CONTAINER (GAMBAR PNG)', drag: 'DRAG & DROP COVER IMAGE (MAX 16MB)', supported: 'SUPPORTED: PNG (UNTUK LSB LOSSLESS)' },
             audio: { accept: '.wav', label: '01. UNGGAH COVER CONTAINER (AUDIO WAV)', drag: 'DRAG & DROP COVER AUDIO (MAX 16MB)', supported: 'SUPPORTED: WAV (PCM 8/16-BIT)' },
@@ -721,6 +781,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         statsContent.classList.add('hidden');
         statsEmpty.classList.remove('hidden');
+
+        const sandMessage = document.getElementById('sandbox-encrypt-message');
+        if (sandMessage) {
+            document.getElementById('sandbox-encrypt-message').value = '';
+            document.getElementById('sandbox-encrypt-password').value = '';
+            document.getElementById('sandbox-encrypt-result').textContent = '-';
+            document.getElementById('sandbox-decrypt-message').value = '';
+            document.getElementById('sandbox-decrypt-password').value = '';
+            document.getElementById('sandbox-decrypt-result').textContent = '-';
+            document.getElementById('sandbox-compress-text').value = '';
+            document.getElementById('sandbox-compress-hex-result').textContent = '-';
+            document.getElementById('sandbox-decompress-hex').value = '';
+            document.getElementById('sandbox-decompress-result').textContent = '-';
+            document.getElementById('sandbox-compress-stats').classList.add('hidden');
+        }
     }
 
     window.switchEncoderMode = function (mode) {
@@ -785,6 +860,63 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    window.switchSandboxCryptoMode = function (mode) {
+        const encBtn = document.getElementById('sandbox-crypto-mode-encrypt');
+        const decBtn = document.getElementById('sandbox-crypto-mode-decrypt');
+        const encForm = document.getElementById('sandbox-crypto-encrypt-form');
+        const decForm = document.getElementById('sandbox-crypto-decrypt-form');
+
+        if (mode === 'encrypt') {
+            encBtn.className = "flex-1 pb-2 text-center text-[#e22718] border-b-2 border-[#e22718] tracking-widest uppercase transition-all";
+            decBtn.className = "flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all";
+            encForm.classList.remove('hidden');
+            decForm.classList.add('hidden');
+        } else {
+            encBtn.className = "flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all";
+            decBtn.className = "flex-1 pb-2 text-center text-[#e22718] border-b-2 border-[#e22718] tracking-widest uppercase transition-all";
+            encForm.classList.add('hidden');
+            decForm.classList.remove('hidden');
+        }
+    };
+
+    window.switchSandboxCodecMode = function (mode) {
+        const compBtn = document.getElementById('sandbox-codec-mode-compress');
+        const decompBtn = document.getElementById('sandbox-codec-mode-decompress');
+        const compForm = document.getElementById('sandbox-codec-compress-form');
+        const decompForm = document.getElementById('sandbox-codec-decompress-form');
+
+        if (mode === 'compress') {
+            compBtn.className = "flex-1 pb-2 text-center text-[#60a5fa] border-b-2 border-[#60a5fa] tracking-widest uppercase transition-all";
+            decompBtn.className = "flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all";
+            compForm.classList.remove('hidden');
+            decompForm.classList.add('hidden');
+        } else {
+            compBtn.className = "flex-1 pb-2 text-center text-slate-500 hover:text-white border-b-2 border-transparent tracking-widest uppercase transition-all";
+            decompBtn.className = "flex-1 pb-2 text-center text-[#60a5fa] border-b-2 border-[#60a5fa] tracking-widest uppercase transition-all";
+            compForm.classList.add('hidden');
+            decompForm.classList.remove('hidden');
+        }
+    };
+
+    window.copyText = function (elementId, btnId) {
+        const text = document.getElementById(elementId).textContent;
+        if (text === '-' || !text) return;
+        navigator.clipboard.writeText(text).then(function () {
+            const btn = document.getElementById(btnId);
+            const icon = btn.querySelector('[data-lucide]');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'check');
+                icon.classList.add('text-green-500');
+                lucide.createIcons();
+                setTimeout(function () {
+                    icon.setAttribute('data-lucide', 'copy');
+                    icon.classList.remove('text-green-500');
+                    lucide.createIcons();
+                }, 2000);
+            }
+        });
+    };
+
     // ==========================================
     // COPY TO CLIPBOARD
     // ==========================================
@@ -805,5 +937,141 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     };
+
+    // ==========================================
+    // SANDBOX INTERACTIVITY LISTENERS
+    // ==========================================
+    const sandboxEncryptBtn = document.getElementById('sandbox-encrypt-btn');
+    const sandboxDecryptBtn = document.getElementById('sandbox-decrypt-btn');
+    const sandboxCompressBtn = document.getElementById('sandbox-compress-btn');
+    const sandboxDecompressBtn = document.getElementById('sandbox-decompress-btn');
+
+    if (sandboxEncryptBtn) {
+        sandboxEncryptBtn.addEventListener('click', async function () {
+            const message = document.getElementById('sandbox-encrypt-message').value.trim();
+            const password = document.getElementById('sandbox-encrypt-password').value.trim();
+            if (!message) {
+                alert('Teks asli wajib diisi.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('message', message);
+            if (password) formData.append('password', password);
+
+            sandboxEncryptBtn.disabled = true;
+            sandboxEncryptBtn.textContent = 'MEMPROSES ENKRIPSI...';
+
+            try {
+                const response = await fetch('/demo/crypto/encrypt', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('sandbox-encrypt-result').textContent = data.encrypted;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Kesalahan koneksi: ' + err.message);
+            } finally {
+                sandboxEncryptBtn.disabled = false;
+                sandboxEncryptBtn.textContent = 'PROSES ENKRIPSI';
+            }
+        });
+    }
+
+    if (sandboxDecryptBtn) {
+        sandboxDecryptBtn.addEventListener('click', async function () {
+            const encrypted = document.getElementById('sandbox-decrypt-message').value.trim();
+            const password = document.getElementById('sandbox-decrypt-password').value.trim();
+            if (!encrypted) {
+                alert('Ciphertext wajib diisi.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('encrypted', encrypted);
+            if (password) formData.append('password', password);
+
+            sandboxDecryptBtn.disabled = true;
+            sandboxDecryptBtn.textContent = 'MEMPROSES DEKRIPSI...';
+
+            try {
+                const response = await fetch('/demo/crypto/decrypt', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('sandbox-decrypt-result').textContent = data.decrypted;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Kesalahan koneksi: ' + err.message);
+            } finally {
+                sandboxDecryptBtn.disabled = false;
+                sandboxDecryptBtn.textContent = 'PROSES DEKRIPSI';
+            }
+        });
+    }
+
+    if (sandboxCompressBtn) {
+        sandboxCompressBtn.addEventListener('click', async function () {
+            const text = document.getElementById('sandbox-compress-text').value.trim();
+            if (!text) {
+                alert('Teks wajib diisi.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('text', text);
+
+            sandboxCompressBtn.disabled = true;
+            sandboxCompressBtn.textContent = 'MEMPROSES KOMPRESI...';
+
+            try {
+                const response = await fetch('/demo/codec/compress', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('sandbox-compress-hex-result').textContent = data.hex;
+                    document.getElementById('sandbox-stat-orig').textContent = data.original_size + ' B';
+                    document.getElementById('sandbox-stat-comp').textContent = data.compressed_size + ' B';
+                    document.getElementById('sandbox-stat-ratio').textContent = data.ratio + '%';
+                    document.getElementById('sandbox-compress-stats').classList.remove('hidden');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Kesalahan koneksi: ' + err.message);
+            } finally {
+                sandboxCompressBtn.disabled = false;
+                sandboxCompressBtn.textContent = 'PROSES KOMPRESI';
+            }
+        });
+    }
+
+    if (sandboxDecompressBtn) {
+        sandboxDecompressBtn.addEventListener('click', async function () {
+            const hex_data = document.getElementById('sandbox-decompress-hex').value.trim();
+            if (!hex_data) {
+                alert('Hex data terkompresi wajib diisi.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('hex_data', hex_data);
+
+            sandboxDecompressBtn.disabled = true;
+            sandboxDecompressBtn.textContent = 'MEMPROSES DEKOMPRESI...';
+
+            try {
+                const response = await fetch('/demo/codec/decompress', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('sandbox-decompress-result').textContent = data.text;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Kesalahan koneksi: ' + err.message);
+            } finally {
+                sandboxDecompressBtn.disabled = false;
+                sandboxDecompressBtn.textContent = 'PROSES DEKOMPRESI';
+            }
+        });
+    }
 
 });
