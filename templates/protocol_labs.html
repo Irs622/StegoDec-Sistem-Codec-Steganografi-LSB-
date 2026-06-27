@@ -103,10 +103,10 @@
                         <i data-lucide="shield" class="w-5 h-5 text-[#0066b1]"></i>
                     </div>
                     <p class="font-light text-justify leading-relaxed">
-                        Unggah file utama Anda sebagai penyamar (cover) pesan rahasia di dalam form pembungkus. Ketikkan
-                        pesan inti yang ingin diisikan. Agar terlindung dari analisis visual yang tajam, kami sarankan
-                        Anda memasang Kata Sandi pembuka. Tekan tombol 'PROCESS & HUSH' untuk memicu enkripsi, kompresi
-                        lossless zlib, dan penyisipan bit LSB.
+                        Unggah file utama Anda sebagai penyamar (cover) pesan rahasia di dalam form pembungkus (Gambar PNG, Audio WAV, atau Video AVI). Ketikkan
+                        pesan inti yang ingin diisikan. Agar terlindung dari analisis visual/auditori yang tajam, kami sarankan
+                        Anda memasang Kata Sandi pembuka. Tekan tombol 'PROCESS & HUSH MEDIA' untuk memicu enkripsi, kompresi
+                        lossless zlib, dan penyisipan bit LSB spasial/temporal.
                     </p>
                 </div>
                 <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
@@ -126,8 +126,8 @@
                     </div>
                     <p class="font-light text-justify leading-relaxed">
                         Setelah dokumen stego berhasil diunduh, Anda dapat membagikannya kepada penerima melalui saluran
-                        komunikasi yang aman (seperti email atau pesan instan). Format PNG menjaga integritas bit piksel
-                        steganografi dari degradasi kompresi lossy.
+                        komunikasi dokumen utuh tanpa kompresi otomatis (seperti opsi kirim dokumen di pesan instan). 
+                        Format lossless (PNG, WAV, dan AVI FFV1) menjaga integritas bit piksel/amplitudo steganografi dari degradasi kompresi lossy.
                     </p>
                 </div>
                 <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
@@ -147,9 +147,9 @@
                     </div>
                     <p class="font-light text-justify leading-relaxed">
                         Penerima mengunduh lampiran Anda, membuka modul pembongkar di panel sisi kanan StegoDec,
-                        melaraskan file tersebut, menyematkan Kunci Kata Sandi yang tepat, dan mengetuk 'START
-                        EXTRACTION'. Sistem StegoDec-core akan mendeteksi penanda khusus steganografi dan memulihkan
-                        payload pesan asli.
+                        melaraskan file tersebut, menyematkan Kunci Kata Sandi yang tepat, dan mengetuk 'START DECODE' (Proses Ekstraksi). 
+                        Sistem StegoDec-core akan mendeteksi penanda khusus delimiter steganografi ====STEGODEC_END==== dan memulihkan
+                        payload pesan asli yang lossless.
                     </p>
                 </div>
                 <div class="mt-8 text-[10px] text-slate-500 uppercase tracking-widest">
