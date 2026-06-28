@@ -1,3 +1,13 @@
+---
+title: StegoDec
+emoji: 🛡️
+colorFrom: red
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # StegoDec — Sistem Codec & Steganografi LSB (Image, Audio, Video)
 
 StegoDec adalah aplikasi berbasis web (Flask Single Page Application) yang mengintegrasikan sistem **Codec Multimedia (Kompresi/Dekompresi)**, **Kriptografi Simetris Vigenere-XOR**, dan **Steganografi LSB (Least Significant Bit)** untuk Gambar, Audio, dan Video. Proyek ini dibangun untuk memenuhi persyaratan UAS Capstone Project Sistem Multimedia.
