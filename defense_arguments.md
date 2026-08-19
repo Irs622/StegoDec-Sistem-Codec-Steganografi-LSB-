@@ -1,45 +1,98 @@
-# Argumen Sidang & Pertahanan Proyek: Desain Sistem StegoDec
+# 🔐 Design Decisions & Security Analysis — StegoDec
 
-Dokumen ini disusun untuk membantu menjawab pertanyaan kritis dari dosen penguji saat sidang Capstone/Tugas Akhir mengenai batasan steganografi spasial Least Significant Bit (LSB) terhadap kompresi lossy (seperti kompresi gambar otomatis pada aplikasi chat WhatsApp, Telegram, Instagram, dll).
-
----
-
-## ❓ Pertanyaan Kritis Penguji (The Core Problem)
-> *"Mengapa Anda menggunakan steganografi LSB? Jika gambar stego ini dikirim melalui WhatsApp, Telegram, atau diunggah ke media sosial, kompresi JPEG akan merusak bit-bit LSB tersebut, dan pesan rahasia tidak akan bisa diekstrak lagi (data loss). Bukankah sistem ini menjadi tidak berguna untuk transfer file di internet?"*
+This document explains the key design decisions behind StegoDec's steganography pipeline and addresses the most common security-critical questions about the system's threat model and operational scope.
 
 ---
 
-## 💡 Strategi Jawaban & Argumen Pertahanan
+## 1. Operational Scope & Threat Model
 
-Anda dapat menjawab pertanyaan ini dengan membagi argumen menjadi **tiga pilar utama**:
+StegoDec is designed for **two specific use cases**:
 
-### 1. Penegasan Batasan Desain & Use Case Sistem (Design Scope & Intent)
-*   **Jawaban**: "StegoDec **sejak awal dirancang khusus untuk Media Penyimpanan Lokal (Cold Storage) atau Saluran Transfer Dokumen Tanpa Kompresi (Lossless Channels)**. Sistem ini bukan dirancang untuk steganografi media sosial (social steganography) yang bersifat publik."
-*   **Penjelasan Detail**:
-    *   **Cold Storage / Local Encryption Archive**: Pengguna ingin menyimpan teks rahasia (seperti kunci privat kripto, kata sandi, atau data medis sensitif) di dalam komputer lokal atau hard disk eksternal mereka tanpa mencurigakan. Menyimpan file teks mentah `.txt` sangat rawan dicurigai, namun menyimpannya sebagai file foto kenangan `.png` (stego) di hard disk lokal tidak akan mengundang perhatian pihak luar (membingungkan analisis/steganalysis).
-    *   **Lossless Document Attachment**: Jika harus ditransfer melalui jaringan, file dikirim sebagai **file dokumen utuh (attachment document)** bukan sebagai kompresi gambar chat. Contohnya, mengirim via email (attachment asli), Google Drive (shared file), sFTP, atau mengirim via Telegram/WhatsApp dengan opsi "Kirim sebagai File/Dokumen" yang menjaga integritas biner berkas 100% tanpa kompresi byte.
+| Use Case | Description |
+|---|---|
+| **Cold Storage / Local Archive** | Storing sensitive data (e.g. private keys, credentials, confidential notes) inside innocuous-looking image or audio files on local disk. A PNG photo among thousands raises no suspicion; a plaintext `.txt` file does. |
+| **Lossless Document Transfer** | Sharing stego files via channels that preserve binary integrity — email attachments, Google Drive, Dropbox, SFTP, or "Send as Document" mode in Telegram/WhatsApp — where the file is transmitted byte-for-byte without re-encoding. |
 
-### 2. Justifikasi Teknis Pemilihan Format PNG & Lossless Codec
-*   **Jawaban**: "Sistem kami secara ketat membatasi output hanya dalam format **PNG (Portable Network Graphics)** yang menggunakan kompresi DEFLATE (lossless). Kami sengaja menghindari format lossy seperti JPEG."
-*   **Penjelasan Detail**:
-    *   Sifat kompresi JPEG didasarkan pada *Discrete Cosine Transform* (DCT) yang membuang frekuensi tinggi (detail halus piksel) untuk menghemat ukuran. Ini secara otomatis merusak bit terakhir (LSB) dari setiap piksel.
-    *   Dengan menggunakan format PNG, kompresinya bersifat matematis-lossless. Setiap piksel yang kita modifikasi dengan LSB Scrambling akan tetap identik 100% dari sisi pengirim hingga penerima selama berkas ditransfer sebagai dokumen asli.
-    *   Integrasi **zlib (level 9) compression** memperkuat aspek ini. Dengan memperkecil ukuran bit payload teks rahasia terlebih dahulu, jumlah piksel gambar yang perlu dimodifikasi menjadi jauh lebih sedikit (payload bit size minimal), meminimalkan distorsi visual dan membuat analisis statistik LSB menjadi semakin sulit dideteksi (*steganalysis resistance*).
-
-### 3. Kelemahan Steganografi Robust (Transform Domain) yang Berdampak pada Payload
-*   **Jawaban**: "Meskipun ada steganografi yang tahan kompresi (seperti metode domain frekuensi/transformasi seperti DCT/DWT), metode tersebut memiliki kompromi berupa **kapasitas payload yang sangat kecil dan kompleksitas komputasi yang tinggi**."
-*   **Penjelasan Detail**:
-    *   Steganografi berbasis LSB dipilih karena memiliki **kapasitas penyimpanan yang sangat besar** (maksimal 3 bit per piksel pada gambar RGB). Hal ini sangat cocok untuk menyembunyikan dokumen teks berukuran menengah hingga besar yang sudah dikompresi oleh modul Codec.
-    *   Di sisi lain, metode tahan kompresi (seperti menyisipkan bit pada koefisien DCT JPEG) hanya mampu menampung sedikit data sebelum kualitas gambar menurun secara drastis secara visual.
+> **Out of scope**: Social steganography (embedding in files shared via platform media feeds). Social media platforms (Instagram, Twitter, Telegram media, WhatsApp media) automatically re-compress uploaded images and videos, destroying LSB data. This is a known limitation of all spatial-domain steganography, not a flaw unique to StegoDec.
 
 ---
 
-## 📝 Contoh Skrip Jawaban Verbal Saat Sidang
+## 2. Why LSB Instead of Transform-Domain Steganography?
 
-> *"Terima kasih atas pertanyaannya Bapak/Ibu Penguji. Pertanyaan tersebut sangat tepat mengenai batasan umum steganografi LSB spasial.*
-> 
-> *Sistem StegoDec yang saya kembangkan dirancang dengan batasan operasional (operational scope) khusus. Sistem ini ditujukan untuk **Cold Storage lokal** atau **Transfer Dokumen Lossless**, bukan untuk publikasi media sosial.*
-> 
-> *Pengguna sistem ini dituntut untuk mengirimkan berkas stego dalam bentuk **dokumen asli (file attachment)** jika ditransfer via email atau aplikasi chat (seperti fitur 'Send as Document' di Telegram/WhatsApp), guna menghindari re-kompresi lossy oleh penyedia platform.*
-> 
-> *Untuk mendukung use case tersebut, StegoDec membatasi format kontainer hanya dalam **PNG (lossless)** dan mengintegrasikan **Lossless Codec zlib level 9** untuk mengecilkan payload biner secara maksimal. Hal ini menjamin data biner yang disisipkan dapat diekstrak kembali dengan akurasi 100% tanpa kehilangan bit satupun (zero-error extraction), sebuah karakteristik yang sangat krusial untuk data teks rahasia."*
+Transform-domain methods (e.g. embedding in DCT coefficients of JPEG) are robust against JPEG re-compression, but come with significant trade-offs:
+
+| Property | LSB (Spatial Domain) | DCT/DWT (Transform Domain) |
+|---|---|---|
+| **Payload capacity** | High — up to 3 bits/pixel for RGB images | Low — typically < 0.1 bits/pixel to avoid visible artefacts |
+| **Computational complexity** | O(n) — very fast | O(n log n) — requires transform & inverse transform |
+| **Lossless channel requirement** | Yes | No (survives some lossy compression) |
+| **Implementation complexity** | Simple | Complex coefficient manipulation required |
+
+For StegoDec's target use cases (local storage and lossless transfer), LSB offers superior capacity and simplicity at the cost of lossy-channel robustness — an acceptable trade-off given the defined operational scope.
+
+---
+
+## 3. Why PNG / WAV / AVI (FFV1) as Carriers?
+
+All stego output formats in StegoDec are **strictly lossless**:
+
+| Format | Compression | Bit-accuracy |
+|---|---|---|
+| **PNG** | DEFLATE (lossless) | ✅ Every pixel stored exactly as written |
+| **WAV (PCM)** | None | ✅ Every sample stored exactly as written |
+| **AVI (FFV1)** | Lossless intra-frame (IETF RFC 9043) | ✅ Every frame pixel stored exactly as written |
+| ~~JPEG~~ | DCT (lossy) | ❌ Quantisation destroys LSBs |
+| ~~MP4 (H.264)~~ | Inter-frame (lossy) | ❌ Temporal prediction destroys LSBs |
+
+Using a lossless container is the single most important requirement for correct LSB extraction. StegoDec enforces this at the API level — the encode endpoints always return the lossless format regardless of input format.
+
+---
+
+## 4. Steganalysis Resistance
+
+### 4.1 Sequential LSB — Vulnerable
+
+A naive implementation embeds bits at positions 0, 1, 2, 3, … in order. Statistical tools (chi-square test, RS analysis) can detect the resulting unnatural bit distribution and confirm that a file contains hidden data.
+
+### 4.2 PRNG Scrambling — Mitigated
+
+StegoDec derives a PRNG seed from the user's password and uses it to shuffle the list of all carrier positions before writing:
+
+```
+Modified positions are indistinguishable from random channel noise
+without the seed (i.e. without the password).
+```
+
+This provides **security through obscurity combined with a secret key** — a significant improvement over sequential LSB, though not a cryptographic guarantee.
+
+### 4.3 Zlib Pre-compression — Reduces Footprint
+
+Compressing the payload before embedding reduces the number of carrier positions that must be modified. Fewer modifications = smaller statistical deviation from an unmodified carrier = harder steganalysis detection.
+
+---
+
+## 5. Sending Stego Files Safely
+
+| Transfer Method | Preserves Binary? | Safe for Stego? |
+|---|---|---|
+| Email attachment | ✅ Yes | ✅ Yes |
+| Google Drive / Dropbox (download link) | ✅ Yes | ✅ Yes |
+| SFTP / SCP | ✅ Yes | ✅ Yes |
+| Telegram — "Send as File / Document" | ✅ Yes | ✅ Yes |
+| WhatsApp — "Send as Document" | ✅ Yes | ✅ Yes |
+| Telegram / WhatsApp — media (image/video) | ❌ Re-compressed | ❌ **Destroys LSBs** |
+| Instagram / Twitter upload | ❌ Re-compressed | ❌ **Destroys LSBs** |
+
+**Rule of thumb**: If the platform shows a preview or thumbnail before sending, it is re-compressing the file. Always use the document/file attachment option.
+
+---
+
+## 6. Cryptographic Limitations & Recommendations
+
+The Vigenere-XOR cipher used in StegoDec is a **lightweight symmetric cipher** designed for ease of implementation and zero external dependencies. It is **not** an industry-standard cipher (e.g. AES-256-GCM) and does not provide formal cryptographic security guarantees.
+
+**Recommendations for high-security deployments**:
+- Pre-encrypt sensitive content with a strong cipher (e.g. GPG / AES-GCM) before passing it to StegoDec.
+- Use StegoDec as a steganographic transport layer on top of an existing encryption layer.
+- Treat the Vigenere-XOR layer as obfuscation, not primary security.
+
